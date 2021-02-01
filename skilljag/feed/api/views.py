@@ -41,25 +41,21 @@ class PostViewSet(mixins.CreateModelMixin,
             para = query_dict.get('recommended')[0]
             user = self.request.user
             skills = user.profile.skills.all()
-            skill1 = skills[0].id
+            """ skill1 = skills[0].id
             skill2 = skills[1].id
             skill3 = skills[2].id
-            skill4 = skills[3].id
-            """ filters&= models.Q(skills__in=skills) """
+            skill4 = skills[3].id """
+            filters&= models.Q(skills__in=skills)
             queryset = Post.objects.filter(filters).distinct()
             #queryset = queryset.annotate(skill1_c=Case(When(skills__in=skill1,then = Value(1)),default=Value(0),output_field=IntegerField()))
-            queryset = queryset.annotate(When(skills__id = skill1,then = 1))
-            for item in queryset:
-                print(str(item))
 
-            print('hai')
             #queryset = queryset.annotate(skill2_c=Case(When(skills__in=skill2,then = Value('1',IntegerField())),default=Value('0',IntegerField())))
             #queryset = queryset.annotate(skill3_c=Case(When(skills__in=skill3,then = Value('1',IntegerField())),default=Value('0',IntegerField())))
             #queryset = queryset.annotate(skill4_c=Case(When(skills__in=skill4,then = Value('1',IntegerField())),default=Value('0',IntegerField())))
             #queryset = queryset.annotate(tot=ExpressionWrapper(F('skill1_c')+F('skill2_c')+F('skill3_c')+F('skill4_c'),output_field=IntegerField())).order_by('-tot')
-            for item in queryset:
+            """ for item in queryset:
                 print(item)
-                #print(item,' ',item.skill1_c,' ',item.skill2_c,' ',item.skill3_c,' ',item.skill3_c,' ',item.tot)
+                print(item,' ',item.skill1_c,' ',item.skill2_c,' ',item.skill3_c,' ',item.skill3_c,' ',item.tot) """
         else:
             for k,vals in query_dict.items():
                 if k in ['category','skills','values','created_by']:
