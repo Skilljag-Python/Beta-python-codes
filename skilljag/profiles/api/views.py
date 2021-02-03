@@ -1,11 +1,13 @@
 from rest_framework.generics import get_object_or_404
+from django.db import models
 from ..models import Profile, AvatarImage
+from core.models import Skill
 from django.utils.timezone import now
 from rest_framework import viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import ProfileSerializer, AvatarImageSerializer
+from .serializers import ProfileFollowSerializer, ProfileSerializer, AvatarImageSerializer
 from .permissions import IsOwnerOrReadOnly
 
 class AvatarImageViewSet(mixins.CreateModelMixin,
@@ -45,7 +47,32 @@ class ProfileViewSet(mixins.RetrieveModelMixin,
 
     def get_queryset(self):
 
-        queryset = Profile.objects.filter(deactivated_at__isnull=True)
+        filters = models.Q()
+        filters &= models.Q(deactivated_at__isnull=True)
+
+        query_dict = {}
+
+        for k in self.request.query_params.keys():
+            query_dict[k] = self.request.query_params.getlist(k)
+
+        for k,vals in query_dict.items():
+            if k in ['city','skills','values','q1','q2','q3','state']:
+                filters &= models.Q(**{f'{k}__in': vals})
+            elif k == 'skillsc':
+                for v in vals:
+                    filters &= models.Q(skills__in=v)
+            elif k == 'valuesc':
+                for v in vals:
+                    filters &= models.Q(**{k: v})
+            elif k == 'bio':
+                for v in vals:
+                    filters&=models.Q(bio__icontains=v)
+            elif k in ["text"]:
+                for v in vals:
+                    textSkills = Skill.objects.filter(title__icontains = v)
+                    filters&=(models.Q(firstname__icontains = v)|models.Q(lastname__icontains = v)| models.Q(skills__in=textSkills))
+
+        queryset = Profile.objects.filter(filters).distinct()
         return queryset
 
     def get_object(self):
@@ -59,3 +86,17 @@ class ProfileViewSet(mixins.RetrieveModelMixin,
     def perform_destroy(self, instance):
         instance.deactivated_at = now()
         instance.save()
+
+
+class ProfileFollowerViewSet(mixins.RetrieveModelMixin,
+                   mixins.ListModelMixin,
+                   viewsets.GenericViewSet):
+
+    serializer_class = ProfileFollowSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = Profile.objects.filter(deactivated_at__isnull=True)
+
+    def get_object(self):
+        if self.kwargs.get('pk') == 'me':
+            return self.request.user.profile
+        return super().get_object()

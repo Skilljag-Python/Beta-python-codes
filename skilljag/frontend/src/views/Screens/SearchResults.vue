@@ -6,7 +6,7 @@
         <v-container class="px-5">
           <v-responsive max-width="" style="">
             <v-text-field
-              v-model="filters.q"
+              v-model="filters.text"
               @blur="getData"
               @keydown.enter="$event.target.blur()"
               placeholder="Search for skill, person's name..."
@@ -18,6 +18,7 @@
               solo-inverted
             ></v-text-field>
           </v-responsive>
+          <br/>
           <v-row>
             <v-col>
               <v-autocomplete
@@ -28,7 +29,7 @@
                   filters.values.length > 4 ? filters.values.pop() : getData();
                 "
                 :rules="[(v) => v.length <= 4 || 'Maximum limit of four.']"
-                item-text="name"
+                item-text="title"
                 item-value="id"
                 chips
                 small-chips
@@ -46,7 +47,7 @@
                 v-model="filters.location"
                 loading="false"
                 :items="locationStore"
-                item-text="name"
+                item-text="title"
                 item-value="id"
                 search-input.sync="search"
                 cache-items
@@ -57,7 +58,7 @@
                 hide-details
                 rounded
                 solo-inverted
-                @change="getData"
+                @change="getData()"
                 clearable
               ></v-autocomplete
             ></v-col>
@@ -75,7 +76,7 @@
         </div>
         <div
           class="caption text-title text-center pa-3"
-          v-else-if="!filters.q.length && !items.length"
+          v-else-if="!filters.text.length && !items.length"
         >
           What are we looking for?
         </div>
@@ -99,11 +100,14 @@
               :inset="item.inset"
             ></v-divider>
 
-            <v-list-item :to="'/user/' + item.username" v-else :key="index">
+            <v-list-item :to="'/user/' + item.id" v-else :key="index">
               <v-list-item-avatar color="grey darken-2" size="90" rounded="lg">
                 <v-img v-if="item.avatar" :src="item.avatar"></v-img>
-                <span v-else class="white--text text-h4">{{
+                <span v-else-if="item.firstname" class="white--text text-h4">{{
                   item.firstname[0]
+                }}</span>
+                <span v-else class="white--text text-h4">{{
+                  item.email[0]
                 }}</span>
               </v-list-item-avatar>
 
@@ -115,17 +119,17 @@
                     ></v-list-item-title></v-col
                   ><v-spacer></v-spacer
                   ><v-col cols="2">
-                    <badge :badge="item.badge_type"></badge> </v-col
+                    <badge :badge="[item.q1,item.q2,item.q3]"></badge> </v-col
                 ></v-row>
                 <v-list-item-subtitle>
                   <div>
                     <v-chip
                       class="ma-1"
                       small
-                      :key="item.name"
-                      v-for="item in item.values"
+                      :key="item.id"
+                      v-for="item in values(item.values)"
                     >
-                      {{ item.name }}
+                      {{ item }}
                     </v-chip>
                   </div>
                   <div>
@@ -133,16 +137,22 @@
                       class="ma-1"
                       outlined
                       :color="index < 4 ? 'purple' : ''"
-                      :key="item.name"
-                      v-for="(item, index) in item.skills"
+                      :key="item.text"
+                      v-for="(item, index) in skills(item.skills)"
                     >
-                      {{ item.name }}
+                      {{ item }}
                     </v-chip>
                   </div>
                 </v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </template>
+          <button
+          v-show="next"
+          @click="loadMoreUsers"
+          class="btn btn-sm"
+          >Load More
+        </button>
         </v-list>
       </v-sheet>
     </v-col>
@@ -176,33 +186,113 @@ export default {
     this.getData();
   },
   methods: {
+    loadMoreUsers:function(){
+      if(this.next) {
+        let endpoint = this.next
+        this.$http.get(endpoint).then(response =>{
+          this.items.push(...response.data.results)
+          if(response.data.next){
+          this.next = response.data.next
+        }
+        else{
+          this.next=null
+        }
+        })
+      }
+
+    },
     useRouteQuery() {
-      this.filters.q = this.$route.query.q;
+      if(this.$route.query.text){
+      this.filters.text = this.$route.query.text;
+      }
+      if(this.$route.query.l){
       this.filters.location = this.$route.query.l;
+      }
       if (this.$route.query.v) {
         this.filters.values = this.$route.query.v.split(",").map(Number);
       }
     },
+    /*
     updateRouteQuery() {
       this.$router
         .replace({
           path: "/search",
           query: {
             q: this.filters.q,
-            v: this.filters.values.join(","),
-            l: this.filters.location,
+            values: this.filters.values.join(","),
+            location: this.filters.location,
           },
         })
         .catch((err) => {});
-    },
+    }, */
     getData() {
-      this.updateRouteQuery();
+      //this.updateRouteQuery();
       this.itemsLoading = true;
-      this.$http.post("/search", this.filters).then((response) => {
-        this.items = response.data;
+      
+      let endpoint = "/api/profiles/?"
+      if (this.filters.values.length>0){
+        var value;
+        for( value of this.filters.values){
+        endpoint = endpoint + "&values=" + value
+        }
+      }
+      if(this.filters.location!=null)
+      {
+       if(this.filters.location[0]=='s')
+       {
+         endpoint = endpoint + "&state=" + this.filters.location.slice(2)
+       }
+       else if(this.filters.location[0]=='c')
+       {
+         endpoint = endpoint + "&city=" + this.filters.location.slice(2)
+       }
+      }
+      if(this.filters.text!=null)
+      {
+          endpoint = endpoint + "&text=" + this.filters.text
+      }
+
+      this.$http.get(endpoint).then((response) => {
+        this.items = response.data.results;
+        console.log(response)
+        if(response.data.next){
+          this.next = response.data.next
+        }
+        else{
+          this.next=null
+        }
+
         this.itemsLoading = false;
       });
     },
+    values(valuess)
+    {
+      var values = [];
+      var vals = this.$store.state.values;
+      valuess.forEach((e) => {
+        vals.forEach((el)=>{
+          if(el.id == e)
+          {
+            values.push(el.title);
+          }
+        }) 
+      });
+      return values;
+  },
+  skills(skillss)
+    {
+      var skills = [];
+      var sks = this.$store.state.skills;
+      skillss.forEach((e) => {
+        sks.forEach((el)=>{
+          if(el.id == e)
+          {
+            skills.push(el.title);
+          }
+        }) 
+      });
+      return skills;
+  },
   },
   computed: {
     valueStore() {
@@ -219,24 +309,26 @@ export default {
       states.forEach(function (o) {
         locationStore.push({
           id: "s-" + o.id,
-          name: o.name,
+          title: o.title,
         });
       });
       cities.forEach(function (o) {
         locationStore.push({
           id: "c-" + o.id,
-          name: o.name,
+          title: o.title,
         });
       });
 
       return locationStore;
     },
+
   },
   data: () => ({
+    next:null,
     filters: {
-      q: "",
+      text: "",
       values: [],
-      location: "",
+      location: null,
     },
     items: [],
     itemsLoading: false,

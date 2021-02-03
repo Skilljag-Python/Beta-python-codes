@@ -21,10 +21,10 @@
               <v-img v-if="avatar" :src="avatar"></v-img>
               <span v-else class="grey--text text-h2">{{ avatarText }}</span>
             </v-avatar>
-            <edit-button
+            <!-- <edit-button
               v-if="editEnabled"
               @on-click="editEnabled = !editEnabled"
-            ></edit-button>
+            ></edit-button> -->
           </v-col>
           <v-col class="align-self-center p-relative"
             ><span class="text-h6">{{ fullName }}</span>
@@ -46,10 +46,10 @@
               <v-icon size="20" class="mr-1">mdi-map-marker-outline</v-icon
               >{{ userState }}
             </div>
-            <edit-button
+            <!-- <edit-button
               v-if="editEnabled"
               @on-click="editEnabled = !editEnabled"
-            ></edit-button>
+            ></edit-button> -->
           </v-col>
           <v-spacer></v-spacer>
           <v-col cols="auto" class="align-self-center">
@@ -80,20 +80,20 @@
         >Skills
         <div>
           <v-chip
-            v-for="(item, index) in user.skills"
+            v-for="(item, index) in skills"
             class="ma-2"
             :color="index < 4 ? 'purple' : ''"
             outlined
             large
             :key="index"
           >
-            {{ item.title }}
+            {{ item }}
           </v-chip>
         </div>
-        <edit-button
+        <!-- <edit-button
           v-if="editEnabled"
           @on-click="editEnabled = !editEnabled"
-        ></edit-button>
+        ></edit-button> -->
       </v-container>
     </v-sheet>
     <v-sheet rounded="lg" class="mt-5">
@@ -170,13 +170,13 @@
             </v-card>
           </v-dialog>
         </div>
-        <edit-button
+        <!-- <edit-button
           v-if="editEnabled"
           @on-click="aboutDialog = true"
-        ></edit-button>
+        ></edit-button> -->
       </v-container>
     </v-sheet>
-    <v-sheet rounded="lg" class="mt-5">
+    <!-- <v-sheet rounded="lg" class="mt-5">
       <v-container class="px-4">Work Gallery</v-container>
       <div v-if="userLoading">
         <v-skeleton-loader
@@ -206,7 +206,7 @@
           </v-img>
         </v-col>
       </v-row>
-    </v-sheet>
+    </v-sheet> -->
   </div>
 </template>
 
@@ -283,10 +283,30 @@ export default {
     values() {
       if (!this.user.values) return;
       var values = [];
+      var vals = this.$store.state.values;
       this.user.values.forEach((e) => {
-        values.push(e.title);
+        vals.forEach((el)=>{
+          if(el.id == e)
+          {
+            values.push(el.title);
+          }
+        }) 
       });
       return values.join(" . ");
+    },
+    skills() {
+      if (!this.user.skills) return;
+      var skills = [];
+      var sks = this.$store.state.skills;
+      this.user.skills.forEach((e) => {
+        sks.forEach((el)=>{
+          if(el.id == e)
+          {
+            skills.push(el.title);
+          }
+        }) 
+      });
+      return skills;
     },
     avatarText() {
       if (!this.user.firstname || !this.user.lastname) {

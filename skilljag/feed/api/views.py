@@ -46,6 +46,9 @@ class PostViewSet(mixins.CreateModelMixin,
             skill3 = skills[2].id
             skill4 = skills[3].id """
             filters&= models.Q(skills__in=skills)
+            if 'category' in query_dict.keys():
+                cat = query_dict.get('category')[0]
+                filters &=models.Q(category=cat)
             queryset = Post.objects.filter(filters).distinct()
             #queryset = queryset.annotate(skill1_c=Case(When(skills__in=skill1,then = Value(1)),default=Value(0),output_field=IntegerField()))
 
@@ -56,27 +59,22 @@ class PostViewSet(mixins.CreateModelMixin,
             """ for item in queryset:
                 print(item)
                 print(item,' ',item.skill1_c,' ',item.skill2_c,' ',item.skill3_c,' ',item.skill3_c,' ',item.tot) """
+        elif 'you' in query_dict.keys():
+            para = query_dict.get('you')[0]
+            user = self.request.user
+            following = user.profile.following.all()
+            """ skill1 = skills[0].id
+            skill2 = skills[1].id
+            skill3 = skills[2].id
+            skill4 = skills[3].id """
+            filters&= (models.Q(created_by__in=following)| models.Q(created_by=user))
+            queryset = Post.objects.filter(filters)
         else:
             for k,vals in query_dict.items():
                 if k in ['category','skills','values','created_by']:
                     filters &= models.Q(**{f'{k}__in': vals})
                 elif k =='uid':
                     filters &= models.Q(created_by__id__in = vals)
-                elif k in ['followers']:
-                    filters &= models.Q(created_by__follows__to_user_id__in = vals)
-                elif k in ['followersc']:
-                    for v in vals:
-                        filters &= models.Q(created_by__follows__to_user_id__in = v)
-                elif k in ['follows']:
-                    filters &= models.Q(created_by__followers__from_user_id__in = vals)
-                elif k in ['followsc']:
-                    for v in vals:
-                        filters &= models.Q(created_by__followers__from_user_id__in = v)
-                elif k in ['interested']:
-                    filters &= models.Q(interests__created_by__id__in = vals)
-                elif k in ['interestedc']:
-                    for v in vals:
-                        filters &= models.Q(interests__created_by__id__in = v)
                 elif k in 'skillsc':
                     for v in vals:
                         filters &= models.Q(skills__in=v)

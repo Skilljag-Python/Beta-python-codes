@@ -1,5 +1,18 @@
 <template>
   <v-row :no-gutters="$vuetify.breakpoint.smAndDown">
+     <v-overlay
+        :value="overlay"
+        v-if="overlay"
+      >
+      <v-container>
+        <v-row justify="center" no-gutters @click="overlay = !overlay">
+          <v-col cols="7">
+              <v-sheet rounded="sm" min-height="268" style="min-height: 268px">
+              </v-sheet>
+            </v-col>
+          </v-row>
+      </v-container>
+     </v-overlay>
     <v-col cols="12" sm="4">
       <v-sheet rounded="lg" min-height="76vh" class="mb-2">
         <div class="text-subtitle-1 pa-3">
@@ -11,35 +24,47 @@
             depressed
             text
             color="grey darken-1"
+            @click="overlay = !overlay"
           >
-            Show all (12)
+            Show all ({{this.$store.state.user.following_count}})
           </v-btn>
         </div>
 
         <v-row class="pa-6 py-3">
           <v-col
-            v-for="(item, index) in this.$store.state.user.following"
-
+            v-for="(item, index) in following.slice(-12)"
             :key="index"
             :class="(item.avatar ? 'd-flex' : '') + 'child-flex'"
             cols="4"
           >
+          <a :href="'/#/user/' + item.id">
+           <v-avatar
+                tile
+                size="90"
+                color="grey">
             <v-img
             v-if="item.avatar"
               style="border-radius: 6px"
               :src="item.avatar"
               aspect-ratio="1"
+              
               class1="grey lighten-2">
             </v-img>
-            <div style="border-radius: 6px" v-else class="grey--text text-h2">{{ avatarText(item) }}</div>
+             <div v-else>
+             
+                <span class="white--text headline" style="border-radius: 6px" >{{ avatarText(item) }}</span>
+             
+             </div>
+              </v-avatar>
          
-            <h3 class="subtitle-2">{{ item.firstname }}</h3>
-            <div class="caption">{{ item.lastname }}</div>
-            <div class="caption">{{ item.company }}</div>
+            <h3 class="caption">{{ item.firstname }}</h3>
+            <!-- <div class="caption">{{ item.lastname }}</div> -->
+            <!-- <div class="caption">{{ item.company }}</div> -->
+            </a>
           </v-col>
         </v-row>
       </v-sheet>
-      <v-sheet rounded="lg" min-height="76vh" class="mb-2">
+      <v-sheet rounded="lg" min-height="76vh" class="mb-2" v-if="false">
         <div class="text-subtitle-1 pa-3">Team</div>
         <v-row class="pa-6 py-3">
           <v-col
@@ -221,29 +246,6 @@
                   ></v-col>
                 </v-row>
                 <v-row>
-                  <v-col cols="12" md="3"
-                    ><span
-                      class="sub-title"
-                      style="position: relative; top: 8px"
-                      >Select category</span
-                    ></v-col
-                  >
-                  <v-col
-                    ><v-autocomplete
-                      :items="categoryStore"
-                      item-value="id"
-                      item-text="name"
-                      label="Category"
-                      v-model="newPost.category_id"
-                      dense
-                      flat
-                      hide-details
-                      solo-inverted
-                      rounded
-                    ></v-autocomplete
-                  ></v-col>
-                </v-row>
-                <v-row>
                   <v-col cols="6" v-for="(image, i) in newImages" :key="i">
                     <v-img
                       style="border-radius: 4px"
@@ -376,7 +378,7 @@ export default {
     new:null,
     showModal:null,
     next:null,
-
+    overlay: false,
     newPost: {
       category: "O",
       description: "",
@@ -384,46 +386,9 @@ export default {
       skills: [],
       values: [],
       category_id: "",
-      title:"notitle"
+      title:""
     },
     following: [],
-    /*     team: [
-      {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/5.jpg",
-        title: "Ernesto Epling",
-        company: "Google",
-        subtitle: `Designer`,
-      },
-
-      {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/4.jpg",
-        title: "Myrna Barb",
-        company: "Google",
-        subtitle: `Designation`,
-      },
-
-      {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/3.jpg",
-        title: "Adina Ealey",
-        company: "Google",
-        subtitle: `Designation`,
-      },
-
-      {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/2.jpg",
-        title: "Ariane Roff",
-        company: "Google",
-        subtitle: `Designation`,
-      },
-
-      {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg",
-        title: "Ariane Roff",
-        company: "Google",
-        subtitle: `Designation`,
-      },
-    ], */
-
     posts: [],
 
     //loaders
@@ -432,6 +397,7 @@ export default {
   }),
   mounted: function () {
     this.loadPosts();
+    this.getFollowing();
      window.addEventListener('keydown', (e) => {
       if (e.key == '=') {
         this.new = !this.showModal;
@@ -439,6 +405,13 @@ export default {
     });
   },
   methods: {
+    getFollowing(){
+      axios.get('/api/followers/me/')
+      .then(response =>{
+        console.log(response)
+        this.following = response.data.following
+      })
+    },
     avatarText(item) {
       if (!item.firstname) {
         return "You";
@@ -472,7 +445,7 @@ export default {
     },
     loadPosts: function () {
 /*       this.postsLoading = true;
- */      let endpoint = "/api/posts/"
+ */      let endpoint = "/api/posts/?you=1"
       if(this.next) {
         endpoint = this.next
       }
@@ -591,6 +564,9 @@ export default {
     },
   },
   computed: {
+    user() {
+      return this.$store.state.user
+    },
     skillStore() {
       return this.$store.state.skills;
     },

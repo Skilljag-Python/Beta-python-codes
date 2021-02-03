@@ -7,9 +7,9 @@
       </v-list-item-avatar>
 
       <v-list-item-content :class="{ 'mr-3': $vuetify.breakpoint.mdAndUp }">
-        <v-list-item-title class="my-2" style="border-bottom: 1px solid #ccc"
-          >{{ userTitle
-          }}<span class="float-right caption grey--text">{{ item.timestamp | moment("from", "now") }}</span></v-list-item-title
+        <v-list-item-title  class="my-2" style="border-bottom: 1px solid #ccc"
+          ><a :href="'/#/user/' + user.id">{{ userTitle
+          }}</a><span class="float-right caption grey--text">{{ item.timestamp | moment("from", "now") }}</span></v-list-item-title
         >
         <div v-if="trending"
         class="text-h6"
@@ -136,7 +136,7 @@
         Comments
       </v-btn>
 
-      <v-menu offset-y>
+      <v-menu offset-y v-if="false">
         <template v-slot:activator="{ on, attrs }">
           <v-btn v-bind="attrs" v-on="on" icon text v-ripple="false">
             <v-icon>mdi-dots-vertical</v-icon>

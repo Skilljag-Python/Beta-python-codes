@@ -46,16 +46,19 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 
     'rest_auth',
     'rest_auth.registration',
 
     'crispy_forms',
     'webpack_loader',
+    'channels',
 
     'core',
     'feed',
     'profiles',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -167,7 +170,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 3# 10 could be a good value to assign in production. Remember: this currently also applies to answers
+    'PAGE_SIZE': 5# 10 could be a good value to assign in production. Remember: this currently also applies to answers
 }
 
 WEBPACK_LOADER = {
@@ -189,3 +192,21 @@ EMAIL_HOST_PASSWORD = 'xbgekjghzdcybkyj' #past the key or password app here
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'lazartony00@gmail.com'
+
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+SOCIALACCOUNT_AUTO_SIGNUP = True
+
+ASGI_APPLICATION = "skilljag.asgi.application"
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}

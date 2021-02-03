@@ -25,7 +25,7 @@
             >
             <div class="text-body-2 grey--text">{{ values }}</div>
 
-            <div v-if="user.highest_ed" class="text-body-2 grey--text"><v-icon size="20" class="mr-1">mdi-school-outline</v-icon>{{ user.highest_ed }}</div>
+            <div v-if="user.highested" class="text-body-2 grey--text"><v-icon size="20" class="mr-1">mdi-school-outline</v-icon>{{ user.highested }}</div>
             <div v-if="user.designation" class="text-body-2 grey--text"><v-icon size="20" class="mr-1">mdi-briefcase-outline</v-icon>{{ user.designation }}</div>
             <div v-if="user.company" class="text-body-2 grey--text"><v-icon size="20" class="mr-1">mdi-office-building-outline</v-icon>{{ user.company }}</div>
             <div v-if="userState" class="text-body-2 grey--text"><v-icon size="20" class="mr-1">mdi-map-marker-outline</v-icon>{{ userState }}</div>
@@ -35,11 +35,11 @@
              </v-col
           ><v-spacer></v-spacer>
           <v-col
-            v-if="user.follow_status"
+            v-if="!userIsCurrentUser"
             cols="auto"
             class="align-self-center"
           >
-            <v-menu offset-y v-if="user.follow_status.following">
+            <v-menu offset-y v-if="user.me_following">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn color="grey" dark v-bind="attrs" v-on="on">
                   Following <v-icon>mdi-chevron-down</v-icon>
@@ -51,24 +51,24 @@
                 </v-list-item>
               </v-list>
             </v-menu>
-            <v-btn
+            <!-- <v-btn
               depressed
               color="grey"
               dark
               v-else-if="user.follow_status.outgoing_request"
               @click="followDestroy"
               >Requested</v-btn
-            >
+            > -->
             <v-btn
               depressed
               color="primary"
               :disabled="userIsCurrentUser"
-              v-else-if="!user.follow_status.following"
+              v-else-if="!user.me_following"
               @click="follow"
               >Follow</v-btn
             >
           </v-col>
-          <v-col cols="auto" class="align-self-center">
+          <v-col cols="auto" class="align-self-center" v-if="!userIsCurrentUser">
             <v-btn
               to="/conversations"
               depressed
@@ -79,7 +79,7 @@
             </v-btn>
           </v-col>
           <v-col class="align-self-center flex-grow-0"
-            ><badge :badge="user.badge_type"></badge>
+            ><badge :badge="[user.q1,user.q2,user.q3]"></badge>
           </v-col>
         </v-row>
         <v-menu offset-y>
@@ -119,14 +119,14 @@
         >Skills
         <div>
           <v-chip
-            v-for="(item, index) in user.skills"
+            v-for="(item, index) in skills"
             class="ma-2"
             :color="index < 4 ? 'purple' : ''"
             outlined
             large
             :key="index"
           >
-            {{ item.name }}
+            {{ item }}
           </v-chip>
         </div>
       </v-container>
@@ -142,12 +142,12 @@
       </div>
       <v-container v-else class="px-4"
         >About
-        <p v1-if="user.about">
-          {{ user.about }}
+        <p v1-if="user.bio">
+          {{ user.bio }}
         </p>
       </v-container>
     </v-sheet>
-    <v-sheet rounded="lg" class="mt-5">
+    <!-- <v-sheet rounded="lg" class="mt-5">
       <v-container class="px-4">Work Gallery</v-container>
       <div v-if="userLoading">
         <v-skeleton-loader
@@ -198,7 +198,7 @@
           </v-img>
         </v-col>
       </v-row>
-    </v-sheet>
+    </v-sheet> -->
   </div>
 </template>
 
@@ -217,20 +217,42 @@ export default {
   methods: {
     loadUser() {
       this.userLoading = true;
-      axios.get("/profiles/" + this.$route.params.username).then((r) => {
+      axios.get("/api/profiles/" + this.$route.params.id + '/').then((r) => {
         this.user = r.data;
 
         this.userLoading = false;
       });
     },
-    follow() {
-      axios.post(`/follows/create/${this.user.username}`).then((r) => {
-        this.user.follow_status = r.data;
+    followDestroy() {
+      var fol;
+      var following=[];
+      for (fol of this.$store.state.user.followers)
+      {
+        if(fol.id!=this.user.id)
+        {
+          following.push(fol.id)
+        }
+      }
+
+      axios.patch(`/api/profiles/me/`,{following: following}).then((r) => {
+        console.log(r.data)
+        this.user.me_following = false;
       });
     },
-    followDestroy() {
-      axios.post(`/follows/destroy/${this.user.username}`).then((r) => {
-        this.user.follow_status = r.data;
+    follow() {
+      var fol;
+      var following=[];
+      for (fol of this.$store.state.user.followers)
+      {
+        if(fol.id!=this.user.id)
+        {
+          following.push(fol.id)
+        }
+      }
+      following.push(this.user.id)
+      axios.patch(`/api/profiles/me/`,{following: following}).then((r) => {
+        console.log(r.data)
+        this.user.me_following = true;
       });
     },
   },
@@ -239,12 +261,12 @@ export default {
       var user = this.user,
       states= this.$store.state.states,
       stateName;
-      if(!user.state_id || !states.length){
+      if(!user.state || !states.length){
         return '';
       }
       states.forEach((e)=>{
-        if(e.id==user.state_id){
-          stateName = e.name;
+        if(e.id==user.state){
+          stateName = e.title;
         }
       });
       return stateName;
@@ -252,10 +274,31 @@ export default {
     fullName() {
       return this.user.firstname + " " + this.user.lastname;
     },
+    skills() {
+      if (!this.user.skills) return;
+      var skills = [];
+      var sks = this.$store.state.skills;
+      this.user.skills.forEach((e) => {
+        sks.forEach((el)=>{
+          if(el.id == e)
+          {
+            skills.push(el.title);
+          }
+        }) 
+      });
+      return skills;
+    },
     values() {
+      if (!this.user.values) return;
       var values = [];
+      var vals = this.$store.state.values;
       this.user.values.forEach((e) => {
-        values.push(e.name);
+        vals.forEach((el)=>{
+          if(el.id == e)
+          {
+            values.push(el.title);
+          }
+        }) 
       });
       return values.join(" . ");
     },
@@ -270,7 +313,7 @@ export default {
     },
     userIsCurrentUser() {
       if (this.userLoading) return true;
-      return this.user.username == this.$store.state.user.username;
+      return this.user.id == this.$store.state.user.id;
     },
   },
 };

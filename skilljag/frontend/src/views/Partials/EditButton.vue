@@ -8,7 +8,8 @@
               icon
               color="yellow darken-3"
               :class="{'v-btn--active':active}"
-              @click="$emit('on-click');"
+              @click= "$router.push({
+        path: '/updateprofile'})"
             >
               <v-icon>mdi-pencil</v-icon>
             </v-btn>

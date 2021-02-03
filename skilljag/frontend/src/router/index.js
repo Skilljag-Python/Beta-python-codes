@@ -92,7 +92,7 @@ const routes = [
     component: MyProfile
   },
   {
-    path: '/user/:username',
+    path: '/user/:id',
     component: Profile
   },
   {
@@ -106,6 +106,10 @@ const routes = [
   {
     path: '/conversations1',
     component: Conversations1
+  },
+  {
+    path: '/updateprofile',
+    component: AdditionalInfo
   }
 ]
 

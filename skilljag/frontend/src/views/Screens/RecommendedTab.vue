@@ -98,7 +98,7 @@
           </template>
           <button
           v-show="next"
-          @click="loadPosts"
+          @click="loadMorePosts"
           class="btn btn-sm"
           >Load More
         </button>
@@ -146,17 +146,40 @@ export default {
       this.posts = [];
       this.loadPosts();
     },
+    loadMorePosts:function(){
+      if(this.next) {
+        let endpoint = this.next
+        axios
+        .get(endpoint, { })
+        .then((r) => {
+          this.posts.push({divider:true, inset:true})
+          this.posts.push(...this.interleave(r.data.results, { divider: true, inset: true }))
+          if (r.data.next) {
+            this.next = r.data.next
+          } else {
+            this.next = null
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .then(() => {
+          this.postsLoading = false;
+          
+        });
+      }
+
+    },
+
     loadPosts: function () {
       this.postsLoading = true;
-      let endpoint = "/api/posts/?category="+this.filters.category
-      if(this.next) {
-        endpoint = this.next
-      }
+      this.post = [];
+      let endpoint = "/api/posts/?recommended=1&category="+this.filters.category
+      console.log(endpoint)
       axios
         //.get("/posts/recommended", { params: this.filters })
         .get(endpoint)
         .then((r) => {
-          this.posts.push({divider:true, inset:true})
           this.posts.push(...this.interleave(r.data.results, { divider: true, inset: true }));
           if (r.data.next) {
             this.next = r.data.next

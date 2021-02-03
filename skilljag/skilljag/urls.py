@@ -29,6 +29,8 @@ from profiles.forms import UserRegistrationForm
 urlpatterns = [
     path('admin/', admin.site.urls),
 
+     # path('accounts/', include('allauth.urls')),
+
     path("accounts/register/",
          RegistrationView.as_view(
              form_class=UserRegistrationForm,
@@ -39,6 +41,9 @@ urlpatterns = [
 
     path("accounts/",
          include("django.contrib.auth.urls")),
+
+     path("chat/",
+         include("chat.urls")),
 
     path("api/",
          include("core.api.urls")),

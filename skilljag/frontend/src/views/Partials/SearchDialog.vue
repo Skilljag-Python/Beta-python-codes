@@ -34,7 +34,7 @@
         <v-container pa-0>
           <v-responsive class="pb-5">
             <v-text-field
-              v-model="q"
+              v-model="text"
               placeholder="Search for skill, person's name..."
               prepend-inner-icon="mdi-magnify"
               dense
@@ -59,7 +59,7 @@
                 rounded
                 v-model="values"
                 :items="valueStore"
-                item-text="name"
+                item-text="title"
                 item-value="id"
                 dense
                 :search-input.sync="valuesInput"
@@ -89,7 +89,7 @@
                 v-model="location"
                 loading="false"
                 :items="locationStore"
-                item-text="name"
+                item-text="title"
                 item-value="id"
                 :search-input.sync="locationInput"
                 cache-items
@@ -133,13 +133,13 @@ export default {
     valuesInput: null,
     locationInput: null,
 
-    q: "",
+    text: "",
     values: [],
     location: "",
   }),
   computed: {
     searchDisabled() {
-      return !this.q || !this.q.length;
+      return !this.text || !this.text.length;
     },
     valueStore() {
       return this.$store.state.values;
@@ -155,13 +155,13 @@ export default {
       states.forEach(function (o) {
         locationStore.push({
           id: "s-" + o.id,
-          name: o.name,
+          title: o.title,
         });
       });
       cities.forEach(function (o) {
         locationStore.push({
           id: "c-" + o.id,
-          name: o.name,
+          title: o.title,
         });
       });
 
@@ -173,7 +173,7 @@ export default {
       this.dialog = false;
       this.$router.push({
         path: "/search",
-        query: { q: this.q, v: this.values.join(","), l: this.location },
+        query: { text: this.text, v: this.values.join(","), l: this.location },
       });
     },
   },

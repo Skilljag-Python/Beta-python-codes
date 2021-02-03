@@ -6,7 +6,7 @@ from core.models import Skill, Value, City
 class Post(models.Model):
 
     category = models.CharField(max_length = 1, choices = (('P', 'Project'),('O', 'Opportunity'),('T', 'Thought')))
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, blank='True')
     description = models.TextField()
     skills = models.ManyToManyField(Skill, related_name='posts', blank=True)
     values = models.ManyToManyField(Value, related_name='posts', blank= True)

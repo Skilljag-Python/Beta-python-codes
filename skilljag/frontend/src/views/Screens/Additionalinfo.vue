@@ -387,7 +387,6 @@
             <v-btn
               :loading="nextLoading"
               v-if="step != 4"
-              :disabled="disabledNext"
               color="primary"
               depressed
               @click="next"
@@ -548,11 +547,12 @@ export default {
       });
     },
     async step3submit() {
+      console.log(this.skills.id)
       this.submit(`/api/profiles/me/`, {
         company: this.company,
         designation: this.designation,
-        values: this.values.id,
-        skills: this.skills.id,
+        values: this.values,
+        skills: this.skills,
         completed_at: new Date
       });
     },
@@ -672,7 +672,7 @@ export default {
     await this.loadSkills();
   },
   computed: {
-    disabledNext() {
+    /* disabledNext() {
       // return false;
       switch (this.step) {
         case 1:
@@ -689,7 +689,7 @@ export default {
         default:
           return false;
       }
-    },
+    }, */
     avatarText() {
       if (!this.firstname || !this.lastname) {
         return "You";

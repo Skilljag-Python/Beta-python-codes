@@ -25,7 +25,7 @@ class Profile(models.Model):
     q1 = models.BooleanField(default = False)
     q2 = models.BooleanField(default = False)
     q3 = models.BooleanField(default = False)
-    pic = models.ImageField(upload_to='ProfilePicture/', blank=True)
+    pic = models.ImageField(upload_to='ProfilePicture/', blank=True, null = True)
     highested = models.CharField(max_length=30, blank=True)
     institution = models.CharField(max_length=30, blank=True)
     company = models.CharField(max_length=30, blank=True)

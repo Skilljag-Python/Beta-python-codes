@@ -49,7 +49,7 @@
             class="py-1"
             cols="12"
             md="auto"
-            :style="$vuetify.breakpoint.mdAndUp ? 'flex-basis: 210px' : ''"
+            :style="$vuetify.breakpoint.mdAndUp ? 'flex-basis: 420px' : ''"
             :class="{ 'pl-2': $vuetify.breakpoint.mdAndUp }"
           >
             <v-text-field
@@ -66,7 +66,7 @@
               @keydown.enter="$event.target.blur()"
             ></v-text-field>
           </v-col>
-          <v-col
+          <!-- <v-col
             class="py-1"
             cols="12"
             md="auto"
@@ -86,7 +86,7 @@
               clearable
               @change="loadPosts"
             ></v-autocomplete>
-          </v-col>
+          </v-col> -->
         </v-row>
       </v-sheet>
       <v-sheet min-height="70vh" style="overflow: hidden">
