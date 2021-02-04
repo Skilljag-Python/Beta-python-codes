@@ -41,7 +41,7 @@
       </v-app-bar>
     </template>
     <template v-else>
-      <v-app-bar  :color="$vuetify.theme.dark ? '' : 'white'" app absolute1 fixed hide-on-scroll dense1 flat>
+      <v-app-bar :color="$vuetify.theme.dark ? '' : 'white'" app absolute1 hide-on-scroll dense1 flat>
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 
         <v-toolbar-title
@@ -172,7 +172,7 @@ export default {
       return this.$route.path == "/search";
     },
     hideTabs() {
-      return this.isSearch || this.$route.path == "/profile" || this.$route.path == "/user/harikrishnanr1";
+      return this.isSearch || this.$route.path == "/profile" || this.$route.path == "/updateprofile" || this.$route.path == "/conversations";
     },
   },
   data: () => ({

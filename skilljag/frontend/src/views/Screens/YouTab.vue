@@ -14,7 +14,7 @@
       </v-container>
      </v-overlay>
     <v-col cols="12" sm="4">
-      <v-sheet rounded="lg" min-height="76vh" class="mb-2">
+      <v-sheet rounded="lg" min-height="76vh" class="mb-2" v-if="$vuetify.breakpoint.mdAndUp">
         <div class="text-subtitle-1 pa-3">
           Following
           <v-btn
@@ -531,20 +531,36 @@ export default {
         .then((response) => {
           console.log(response);
           if (response.status == 201) {
-            for (var i = 0; i < this.newPost.files.length; i++) {
-              let file = this.newPost.files[i];
-              const imagedata = new FormData();
-              imagedata.append('image',file)
-              imagedata.append('post',response.data.id)
-              axios
-              .post("/api/images/", imagedata);
-
+            var count = this.newPost.files.length;
+            if(count> 0)
+            {
+              
+              for (var i = 0; i < this.newPost.files.length; i++) {
+                  let file = this.newPost.files[i];
+                  const imagedata = new FormData();
+                  imagedata.append('image',file)
+                  imagedata.append('post',response.data.id)
+                  axios
+                  .post("/api/images/", imagedata)
+                  .then(response => {
+                    count--;
+                    if(count == 0)
+                    {
+                      this.dialog = false;
+                      this.initNewPost();
+                      this.loadPosts();
+                    }
+                    });
+                }
             }
-
-            this.dialog = false;
-            this.initNewPost();
-            this.loadPosts();
+            else
+            {
+              this.dialog = false;
+              this.initNewPost();
+              this.loadPosts();
+            }
           }
+
           if (response.error) {
             this.newPostError = response.data.error;
             this.hasNewPostError = true;

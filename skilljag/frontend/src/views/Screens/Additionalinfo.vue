@@ -300,6 +300,7 @@
                     /> -->
                   </v-col>
                 </v-row>
+                <!-- 3 -->
                 <v-form ref="formp" v-model="validbasics3" lazy1-validation1>
                   <v-row>
                     <v-col cols="12">
@@ -313,6 +314,13 @@
                       <v-text-field
                         v-model="designation"
                         label="Designation (optional)"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="bio"
+                        label="Bio (optional)"
                         required
                       ></v-text-field>
                     </v-col>
@@ -352,10 +360,30 @@
                     chips
                     small-chips
                     hide-details1
-                    label="Skills*"
+                    label="Core Skills*"
                     multiple
                     :rules="[
                       (v) => v.length >= 2 || 'Please select at least two',
+                      (v) => v.length <= 20 || 'Not more than twenty',
+                    ]"
+                  ></v-autocomplete>
+                  <v-autocomplete
+                    class="my-4"
+                    rounded
+                    required
+                    v-model="askills"
+                    :items="askillsStore"
+                    item-value="id"
+                    item-text="title"
+                    dense1
+                    :search-input.sync="searchInput"
+                    @change="searchInput = ''"
+                    chips
+                    small-chips
+                    hide-details1
+                    label="Additional Skills*"
+                    multiple
+                    :rules="[
                       (v) => v.length <= 20 || 'Not more than twenty',
                     ]"
                   ></v-autocomplete>
@@ -387,6 +415,7 @@
             <v-btn
               :loading="nextLoading"
               v-if="step != 4"
+              :disabled="disabledNext"
               color="primary"
               depressed
               @click="next"
@@ -434,9 +463,12 @@ export default {
     avatar: "",
     company: "",
     designation: "",
+    bio:"",
     skillsStore: [],
+    askillsStore: [],
     valuesStore: [],
     skills: [],
+    askills: [],
     values: [],
     phone: "",
     email: "",
@@ -473,6 +505,7 @@ export default {
     dataLoading: false,
     valuesLoading: false,
     skillsLoading: false,
+    askillsLoading: false
   }),
   methods: {
     handleUploading(form, xhr) {
@@ -547,12 +580,13 @@ export default {
       });
     },
     async step3submit() {
-      console.log(this.skills.id)
       this.submit(`/api/profiles/me/`, {
         company: this.company,
         designation: this.designation,
-        values: this.values,
-        skills: this.skills,
+        bio: this.bio,
+        values: this.values.id,
+        skills: this.skills.id,
+        askills: this.askills.id,
         completed_at: new Date
       });
     },
@@ -621,6 +655,15 @@ export default {
         }
       });
     },
+    async loadAskills() {
+      this.askillsLoading = true;
+      await this.$http.get(`/api/skills/`).then((response) => {
+        if (response.data !== "") {
+          this.askillsLoading = false;
+          this.askillsStore = response.data;
+        }
+      });
+    },    
     async loadCities(noreset) {
       if (!this.state) return;
       if (this.city && !noreset) this.city = "";
@@ -651,7 +694,9 @@ export default {
           this.institution = d.institution;
           this.company = d.company;
           this.designation = d.designation;
+          this.bio = d.bio;
           this.skills = d.skills;
+          this.askills = d.askills;
           this.values = d.values;
           this.avatar = d.avatar;
           try {
@@ -670,18 +715,16 @@ export default {
     await this.loadCities(true);
     await this.loadValues();
     await this.loadSkills();
+    await this.loadAskills();
   },
   computed: {
-    /* disabledNext() {
+    disabledNext() {
       // return false;
       switch (this.step) {
         case 1:
           return !this.validbasics1;
         case 2:
-          return (
-            (this.q1work == "false") &&
-            (this.q2mentor == "false" )
-          );
+          return false
         case 3:
           return !this.validbasics3;
         case 4:
@@ -689,7 +732,7 @@ export default {
         default:
           return false;
       }
-    }, */
+    },
     avatarText() {
       if (!this.firstname || !this.lastname) {
         return "You";

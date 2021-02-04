@@ -8,5 +8,5 @@ class Message(models.Model):
 
 class Chat(models.Model):
     participants = models.ManyToManyField(User, related_name='chats',blank =True)
-    messages = models.ManyToManyField(Message, blank=True)
+    messages = models.ManyToManyField(Message, blank=True, related_name='chats')
 

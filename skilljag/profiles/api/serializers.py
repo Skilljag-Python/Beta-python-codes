@@ -98,7 +98,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ['me_following','id','firstname','lastname','email','gender','birthdate','bio','phone','city','languages','skills','values','q1','q2','q3','pic','highested','designation','tandcversion','avatar','completed_at','followers', 'following', 'followers_count', 'following_count','institution','state', 'company']
+        fields = ['askills','me_following','id','firstname','lastname','email','gender','birthdate','bio','phone','city','languages','skills','values','q1','q2','q3','pic','highested','designation','tandcversion','avatar','completed_at','followers', 'following', 'followers_count', 'following_count','institution','state', 'company']
 
 
 class ProfileFollowSerializer(serializers.ModelSerializer):

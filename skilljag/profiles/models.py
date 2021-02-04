@@ -21,6 +21,8 @@ class Profile(models.Model):
     state = models.ForeignKey(State, on_delete = models.SET_NULL, related_name = 'users', null=True)
     languages = models.ManyToManyField(Language, related_name='users', blank=True)
     skills = models.ManyToManyField(Skill, related_name = 'users', blank= True)
+    askills = models.ManyToManyField(Skill, related_name = 'ausers', blank= True)
+
     values = models.ManyToManyField(Value, related_name = 'users', blank =True)
     q1 = models.BooleanField(default = False)
     q2 = models.BooleanField(default = False)

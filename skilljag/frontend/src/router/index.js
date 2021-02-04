@@ -56,6 +56,8 @@ Vue.component('avatar', require('../views/Partials/Avatar.vue').default);
 Vue.component('ad', require('../views/Partials/Ad.vue').default);
 Vue.component('badge', require('../views/Partials/Badge.vue').default);
 Vue.component('edit-button', require('../views/Partials/EditButton.vue').default);
+Vue.component('post-carousel', require('../views/Partials/PostCarousel.vue').default);
+Vue.component('multi-comments', require('../views/Partials/MultiComments.vue').default);
 
 
 import Online from '../views/Screens/OnlineTab.vue'
@@ -67,7 +69,7 @@ import Profile from '../views/Screens/Profile.vue'
 import Search from '../views/Screens/SearchResults.vue'
 import Conversations from '../views/Screens/Conversations.vue'
 import Conversations1 from '../views/Screens/Conversations1.vue'
-import AdditionalInfo from '../views/Screens/Additionalinfo.vue'
+import EditInfo from '../views/Screens/EditInfo.vue'
 
 
 const routes = [
@@ -109,7 +111,7 @@ const routes = [
   },
   {
     path: '/updateprofile',
-    component: AdditionalInfo
+    component: EditInfo
   }
 ]
 

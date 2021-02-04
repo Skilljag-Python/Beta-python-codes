@@ -2,9 +2,19 @@
 {% load crispy_forms_tags %}
 
 {% block auth %}
-<h3>Create Your SkillJag Account</h3>
+
 <div class="registration-form-container">
     <form method="POST">
+        <div class="container">
+            
+            <div class="myCard">
+                        <div class="myLeftCtn"> 
+                            <form class="myForm text-center">
+                                <div class="img"> <img src= "/media/login/text.png"  width="135" height="60">
+                                  <header>Create Your SkillJag Account</header>
+                                      <p class="lead text-muted">Connecting Experts!</p>
+                                <div class="form-group">
+                                  </div>
         {% csrf_token %}
         {{ form|crispy }}
         <button type="submit" class="btn btn-sm btn-outline-primary">Create Account</button>

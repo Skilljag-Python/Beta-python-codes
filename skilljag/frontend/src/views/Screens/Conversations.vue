@@ -1,6 +1,15 @@
 <template>
   <div>
+    <div>{{text}}</div>
     <chat-window
+      style="z-index: 0"
+      height="calc(100vh - 115px)"
+      class="my-md-5"
+      :currentUserId="currentUserId"
+      :rooms="rooms"
+      :messages="messages"
+    />
+   <!--  <chat-window
       style="z-index: 0"
       height="calc(100vh - 115px)"
       class="my-md-5"
@@ -10,8 +19,8 @@
       :textMessages="textMessages"
       @sendMessage="sendMessage"
       :theme="$vuetify.theme.isDark ? 'dark' : 'light'"
-    />
-    <v-dialog
+    /> -->
+    <!-- <v-dialog
       transition="dialog-top-transition"
       v-model="requestDialog"
       overlay-opacity=".6"
@@ -23,8 +32,8 @@
             <v-icon>mdi-magnify</v-icon>
           </v-btn></template
         >
-      </template>
-      <v-card>
+      </template> -->
+      <!-- <v-card>
         <v-card-title>Send conversation request to John!</v-card-title>
         <v-card-text>
           <p class="text-subtitle">
@@ -127,8 +136,8 @@
             Send
           </v-btn>
         </v-card-actions>
-      </v-card>
-    </v-dialog>
+      </v-card> -->
+    <!-- </v-dialog> -->
   </div>
 </template>
 
@@ -140,198 +149,97 @@ export default {
   components: {
     ChatWindow,
   },
-  methods: {
-    sendRequest() {
-      this.requestDialog = false;
-      this.messages.push({
-        _id: 7890,
-        content: this.requestMessage,
-        sender_id: 1234,
-        username: "Harikrishnan R",
-        date: "13 November",
-        timestamp: "10:20",
-        saved: true,
-        distributed: true,
-        seen: !true,
-        disable_actions: false,
-        disable_reactions: false,
-      });
-      this.rooms[0].lastMessage = {
-        content: this.requestMessage,
-        sender_id: 1234,
-        username: "Harikrishnan R",
-        timestamp: "10:30",
-        date: 123242424,
-        saved: true,
-        distributed: false,
-        seen: false,
-        new: true,
-      };
-    },
-    assertMaxChars: function () {
-      if (this.request.topic.length >= 30) {
-        this.request.topic = this.request.topic.substring(0, 30);
-        return false;
-      }
-    },
-    limit(event, dataProp, limit) {
-      if (this["request"][dataProp].length >= limit) {
-        event.preventDefault();
-      }
-    },
-    async sendMessage({ content, roomId, file, replyMessage }) {
-      var d = new Date();
-
-      const message = {
-        _id: 7890,
-        content: content,
-        sender_id: this.currentUserId,
-        username: "John Doe",
-        date: "13 November",
-        timestamp: d.getHours() + ":" + d.getMinutes(),
-        saved: !true,
-        distributed: !true,
-        seen: !true,
-        disable_actions: false,
-        disable_reactions: false,
-      };
-
-      if (file) {
-        message.file = {
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          url: file.localUrl,
-        };
-      }
-      if (replyMessage) {
-        message.replyMessage = {
-          _id: replyMessage._id,
-          content: replyMessage.content,
-          sender_id: replyMessage.sender_id,
-        };
-        if (replyMessage.file) {
-          message.replyMessage.file = replyMessage.file;
-        }
-      }
-      // const { id } = await this.messagesRef(roomId).add(message);
-      if (file) this.uploadFile({ file, messageId: id, roomId });
-      this.messages.push(message);
-    },
-  },
-  computed: {
-    requestSendDisabled() {
-      return this.request.topic.length > 30 || this.request.topic.length < 4;
-    },
-    requestMessage() {
-      return (
-        `Hello. I would like to discuss about ${this.request.topic} for my new work. Could you mentor me on this?` +
-        (this.request.date ? ` Could we connect on ${this.request.date}?` : "")
-      );
-    },
-  },
-  mounted: function () {
-    setTimeout(() => {
-      this.requestDialog = true;
-    }, 500);
-  },
   data() {
     return {
-      requestDialog: !true,
-      dateModal: false,
-      request: {
-        topic: "",
-        date: "",
-      },
+      text:"Test",
       rooms: [
         {
           roomId: 1,
-          avatar: "",
-          roomName: "John",
-          unreadCount: 0,
-          // lastMessage: {
-          //   content: "Yes",
-          //   sender_id: 1234,
-          //   username: "John Doe",
-          //   timestamp: "10:20",
-          //   date: 123242424,
-          //   saved: true,
-          //   distributed: false,
-          //   seen: false,
-          //   new: true,
-          // },
+          roomName: 'Austin',
+          avatar: 'assets/imgs/people.png',
+          unreadCount: 4,
+          index: 3,
           users: [
             {
-              _id: 1234,
-              username: "John Doe",
-              status: {
-                state: "online",
-                last_changed: "today, 14:30",
-              },
-            },
-            {
               _id: 4321,
-              username: "John",
-              status: {
-                state: "offline",
-                // last_changed: "14 July, 20:00",
-                last_changed: "",
-              },
-            },
+              username: 'Austin',
+              avatar: 'assets/imgs/snow.png',
+            }
           ],
-          typingUsers: [4321],
-        },
+        }
       ],
-      messages: [],
-      messages1: [
-        {
-          _id: 7890,
-          content: "message 1",
-          sender_id: 1234,
-          username: "John Doe",
-          date: "13 November",
-          timestamp: "10:20",
-          saved: true,
-          distributed: true,
-          seen: true,
-          disable_actions: false,
-          disable_reactions: false,
-          file: {
-            name: "My File",
-            size: 67351,
-            type: "png",
-            url: "http://skilljag.test/images/p3.jpg",
-          },
-          reactions: {
-            wink: [
-              1234, // USER_ID
-              4321,
-            ],
-            laughing: [1234],
-          },
+      messages: [
+      {
+        _id: 7890,
+        content: 'message 1',
+        sender_id: 4321,
+        username: 'John Doe',
+        date: '13 November',
+        timestamp: '10:20',
+        system: false,
+        disable_actions: true,
+        disable_reactions: true,
+        file: {
+          name: 'My File',
+          type: 'png',
+          url: 'https://yt3.ggpht.com/ytc/AAUvwnjE8Rr34euMGiWeb8C5Q7K0WA8hx7-Cdm0oY4PoZw=s900-c-k-c0x00ffffff-no-rj'
         },
-        {
-          _id: 7891,
-          content: "Yes",
-          sender_id: 1235,
-          username: "Doe John",
-          date: "13 November",
-          timestamp: "10:20",
-          saved: true,
-          distributed: true,
-          seen: true,
-          disable_actions: false,
-          disable_reactions: false,
-          reactions: {
-            laughing: [1234],
-          },
-        },
-      ],
-      textMessages: { ROOMS_EMPTY: "No Conversations" },
-      currentUserId: 1234,
-    };
+      }
+    ],
+      currentUserId: 1
+    }
   },
-};
+  methods: {
+    setText(text) {
+      this.text = text
+    },
+    getRooms() {
+      axios.get('/api/chats/')
+      .then(response => {
+        console.log(response)
+        var rooms = []
+        response.data.results.forEach(element => {
+          var room = Object()
+          room.roomId = element.id
+          room.users = []
+          element.participants.forEach(e => {
+            var user = []
+            user._id = e.id
+            user.username = e.firstname
+            user.avatar = e.avatar
+            room.users.push(user)
+            if(e.id != this.currentUserId)
+            {
+              room.roomName = user.username
+            }
+          })
+          console.log(room)
+          rooms.push(room)
+        });
+        console.log(rooms)
+        this.rooms = rooms;
+      })
+    }
+  },
+  mounted () {
+    //this.getRooms()
+    this.setText("hello")
+    let v = this
+    const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + 'hai'
+            + '/'
+        );
+
+    chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            console.log(data.message);
+            v.setText(data.message);
+        };
+  }
+}
 </script>
 
 <style>

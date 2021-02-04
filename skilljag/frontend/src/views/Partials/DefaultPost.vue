@@ -26,37 +26,15 @@
           v-html="item.description"
         ></v-list-item-subtitle>
         <div class="mt-3" style="width: 100%">
-          <template v-if="item.images.length">
+          <template v-if="item.images.length==1">
             <v-img
               :src="item.images[0].image"
               aspect-ratio="2"
               style="border-radius: 10px"
             ></v-img>
           </template>
-          <template v-if="item.images.length > 1">
-            <v-slide-group
-              style1="width: 95%"
-              v-model="slideGroup"
-              class="py-4"
-              mandatory
-              show-arrows
-            >
-              <v-slide-item
-                v-for="(image, index) in item.images"
-                :key="index"
-                v-show="index!=0"
-                v1-slot="{ active, toggle }"
-              >
-                <v-img
-                  style="border-radius: 4px"
-                  :class="'mx-2' + (index == 0 ? ' ml-0' : '')"
-                  :src="image.image"
-                  width="115"
-                  height1="100"
-                  aspect-ratio="1.8"
-                ></v-img>
-              </v-slide-item>
-            </v-slide-group>
+          <template v-else-if="item.images.length > 1">
+            <post-carousel v-bind:images=item.images />
           </template>
         </div>
       </v-list-item-content>
@@ -133,8 +111,13 @@
 
       <v-btn value="center" text @click="commentsClick">
         <v-icon class="mr-1">mdi-comment-outline</v-icon>
-        Comments
+        Comments ({{item.comment_count}})
       </v-btn>
+      <multi-comments
+          :isHidden=isHidden
+          :comments=item.comments
+          :post_id=item.id
+          /> 
 
       <v-menu offset-y v-if="false">
         <template v-slot:activator="{ on, attrs }">
@@ -164,6 +147,8 @@ export default {
   data: () => ({
     slideGroup:'',
     overlay: false,
+    isHidden: true,
+    comments:[],
   }),
   computed: {
     user() {
@@ -203,10 +188,11 @@ export default {
 
     },
     commentsClick() {
-      if (!this.item.images.length) {
+      /* if (!this.item.images.length) {
         return;
       }
-      this.overlay = !this.overlay;
+      this.overlay = !this.overlay; */
+      this.isHidden=!this.isHidden
     },
     abbreviate_number(num, fixed) {
       if (num === null) {
