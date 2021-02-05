@@ -53,14 +53,17 @@ INSTALLED_APPS = [
 
     'crispy_forms',
     'webpack_loader',
-
-
+    'channels',
+    
     'core',
     'feed',
     'profiles',
-    'chat'
+    'chat',
+    
+    ]
 
-]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -200,3 +203,14 @@ SOCIALACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 SOCIALACCOUNT_AUTO_SIGNUP = True
+
+ASGI_APPLICATION = 'skilljag.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}

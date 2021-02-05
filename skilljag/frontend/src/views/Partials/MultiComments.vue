@@ -13,7 +13,7 @@
             <hr>
         </div>
         <div class="reply">
-            <div class="avatar">
+            <div class="avatar" style="position:absolute; top:7px;">
                 <img :src="currentUser.avatar" alt="">
             </div>
             <input

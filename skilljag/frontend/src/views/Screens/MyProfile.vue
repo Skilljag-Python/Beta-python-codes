@@ -97,6 +97,32 @@
       </v-container>
     </v-sheet>
     <v-sheet rounded="lg" class="mt-5">
+            
+            <div v-if="userLoading">
+                <v-skeleton-loader
+                    class="mx-auto"
+                    type="list-item-two-line"
+                    v-for="n in 1"
+                    :key="n"
+                ></v-skeleton-loader>
+            </div>
+            <v-container v-else class="px-4 p-relative">
+                Additional Skills
+                <div>
+                    <v-chip
+                        v-for="(item, index) in askills"
+                        class="ma-2"
+                        :color="index < 4 ? 'orange' : ''"
+                        outlined
+                        large
+                        :key="index"
+                    >
+                        {{ item }}
+                    </v-chip>
+                </div>
+            </v-container>          
+        </v-sheet>
+    <v-sheet rounded="lg" class="mt-5">
       <div v-if="userLoading">
         <v-skeleton-loader
           class="mx-auto"
@@ -307,6 +333,20 @@ export default {
         }) 
       });
       return skills;
+    },
+    askills() {
+      if (!this.user.askills) return;
+      var askills = [];
+      var asks = this.$store.state.skills;
+      this.user.askills.forEach((e) => {
+        asks.forEach((el)=>{
+          if(el.id == e)
+          {
+            askills.push(el.title);
+          }
+        }) 
+      });
+      return askills;
     },
     avatarText() {
       if (!this.user.firstname || !this.user.lastname) {

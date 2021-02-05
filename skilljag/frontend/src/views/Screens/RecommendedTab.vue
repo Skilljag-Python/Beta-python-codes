@@ -96,12 +96,20 @@
 
             <post v-else :item="item" :key="index"></post>
           </template>
-          <button
+          <v-divider/>
+          <br/>
+          <br/>
+         <div>
+          <v-btn
           v-show="next"
           @click="loadMorePosts"
-          class="btn btn-sm"
+          outlined
+          absolute
+          z-index:9999
+          :style="{left:'30px', bottom:'18px'}"
           >Load More
-        </button>
+          </v-btn>
+        </div>
         </v-list>
       </v-sheet>
     </v-col>

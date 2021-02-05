@@ -14,20 +14,9 @@
       </v-container>
      </v-overlay>
     <v-col cols="12" sm="4">
-      <v-sheet rounded="lg" min-height="76vh" class="mb-2" v-if="$vuetify.breakpoint.mdAndUp">
+      <v-sheet rounded="lg" min-height="76vh" class="mb-2" v-if="$vuetify.breakpoint.mdAndUp" style="overflow-y:auto; overflow-x:hidden">
         <div class="text-subtitle-1 pa-3">
           Following
-          <v-btn
-            class="float-right"
-            dense
-            small
-            depressed
-            text
-            color="grey darken-1"
-            @click="overlay = !overlay"
-          >
-            Show all ({{this.$store.state.user.following_count}})
-          </v-btn>
         </div>
 
         <v-row class="pa-6 py-3">
@@ -332,12 +321,20 @@
 
             <post v-else :item="item" :key="index"></post>
           </template>
-          <button
+          <v-divider/>
+          <br/>
+          <br/>
+         <div>
+          <v-btn
           v-show="next"
-          @click="loadPosts"
-          class="btn btn-sm"
+          @click="loadMorePosts"
+          outlined
+          absolute
+          z-index:9999
+          :style="{left:'30px', bottom:'18px'}"
           >Load More
-        </button>
+          </v-btn>
+        </div>
         </v-list>
       </v-sheet>
     </v-col>
@@ -403,6 +400,7 @@ export default {
       }
     });
   },
+  
   methods: {
     getFollowing(){
       axios.get('/api/followers/me/')
@@ -442,12 +440,34 @@ export default {
     interleave(arr, thing) {
       return [].concat(...arr.map((n) => [n, thing])).slice(0, -1);
     },
+    loadMorePosts:function(){
+      if(this.next) {
+        let endpoint = this.next
+        axios
+        .get(endpoint, { })
+        .then((r) => {
+          this.posts.push({divider:true, inset:true})
+          this.posts.push(...this.interleave(r.data.results, { divider: true, inset: true }))
+          if (r.data.next) {
+            this.next = r.data.next
+          } else {
+            this.next = null
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .then(() => {
+          this.postsLoading = false;
+          
+        });
+      }
+
+    },
     loadPosts: function () {
+      this.posts = []
 /*       this.postsLoading = true;
  */      let endpoint = "/api/posts/?you=1"
-      if(this.next) {
-        endpoint = this.next
-      }
       axios
         .get(endpoint)
         .then((r) => {
@@ -501,14 +521,6 @@ export default {
 
       let formData = new FormData();
 
-      // files
-
-     /*  for (var i = 0; i < this.newPost.files.length; i++) {
-        let file = this.newPost.files[i];
-
-        formData.append("images[" + i + "]", file);
-      } */
-      // additional data
       var data = this.newPost;
       for (let key in data) {
         if(key == 'files')
@@ -516,7 +528,8 @@ export default {
           console.log(key)
         }
         else 
-        {if (typeof data[key] === "object") {
+        {
+          if (typeof data[key] === "object") {
           for (let subKey in data[key]) {
             formData.append(`${key}.${subKey}`, data[key][subKey]);
           }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div>Hai {{user.id}}</div>
+    <div>Hai {{text}}</div>
     <chat-window
       style="z-index: 0"
       height="calc(100vh - 115px)"
@@ -164,6 +164,8 @@ export default {
       rooms: [ ],
       messages: [ ],
       roomId: null,
+      chatSocket: null,
+      count: 0,
     }
   },
   methods: {
@@ -200,21 +202,6 @@ export default {
             message.system=false
             room.messages.push(message)
           })
-          /* console.log(room)*/
-          /* let v = this
-          const chatSocket = new WebSocket(
-              'ws://'
-              + window.location.host
-              + '/ws/chat/'
-              + room.roomId
-              + '/'
-          );
-
-          chatSocket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            console.log(data.message);
-            v.setText(data.message);
-          }; */
           rooms.push(room)
         });
         console.log(rooms)
@@ -232,17 +219,32 @@ export default {
       })
     },
     sendMessage ({ roomId, content, file, replyMessage }) { 
-      axios.post('/api/messages/',{room:roomId, content:content})
+      this.chatSocket.send(JSON.stringify({
+                'message': content,
+                'room_id':roomId
+            }));
+     axios.post('/api/messages/',{room:roomId, content:content})
       .then(response => {
-        console.log(response)
         if(response.status == 201)
-        {        }
-        this.getRooms()
-      })
+        {        
+          /* var message = Object()
+          message._id = e.id
+          message.content = e.content
+          message.sender_id = e.created_by
+          message.timestamp = e.timestamp
+          message.system=false
+          this.rooms.forEach(element => {
+            if(element.roomId == roomId){
+              element.messages.push(message)
+              this.messages.push(message)
+            }
+          }) */
+         }
+      }) 
     } ,
     fetchMessages({room, options}){
       this.roomId = room.roomId
-      this.getRooms()
+      this.getMessages(this.roomId)
       /* if(options && options.reset){
         this.getMessages(room.roomId)
       }
@@ -259,19 +261,36 @@ export default {
   mounted () {
     this.getRooms()
   },
+  beforeDestroy()
+  {
+    this.chatSocket.close()
+  },
   created () {
     let v = this
-    const chatSocket = new WebSocket(
+    this.chatSocket = new WebSocket(
         'ws://'
         + window.location.host
         + '/ws/chat/'
+        + 'qwe/'
     );
-
-    chatSocket.onmessage = function(e) {
+    this.chatSocket.onmessage = function(e) {
       const data = JSON.parse(e.data);
-      console.log(data.message);
-      v.setText(data.message);
-      v.getRooms()
+      console.log(data)
+      var message = Object()
+      message._id = "temp"+v.count;
+      v.count = v.count +1;
+      var roomId = data.room_id
+      message.content = data.message
+      message.sender_id = data.created_by
+      message.timestamp = data.timestamp
+      message.system=false
+      v.rooms.forEach(element => {
+        if(element.roomId == roomId){
+          element.messages.push(message)
+          //v.messages.push(message)
+        }
+      }) 
+      
     };
   }
 }

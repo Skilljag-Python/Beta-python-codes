@@ -121,13 +121,22 @@
               :item="item"
               :key="index"
             ></post>
+             
           </template>
-          <button
+          <v-divider/>
+          <br/>
+          <br/>
+         <div>
+          <v-btn
           v-show="next"
           @click="loadMorePosts"
-          class="btn btn-sm"
+          outlined
+          absolute
+          z-index:9999
+          :style="{left:'30px', bottom:'18px'}"
           >Load More
-        </button>
+          </v-btn>
+        </div>
         </v-list>
       </v-sheet>
     </v-col>
@@ -160,7 +169,7 @@
               <v-icon size="24" v-if="i != 0">{{ icon }}</v-icon>
               <v-img
                 v-else
-                src="/images/logo/color/icon/icon-192.png"
+                src="/media/images/logo/color/icon/icon-192.png"
                 width="4"
               ></v-img>
             </v-list-item-icon>

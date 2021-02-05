@@ -397,7 +397,7 @@
                   class="mb-4"
                   contain
                   height="128"
-                  src="/images/logo/color/icon/icon.png"
+                  src="/media/images/logo/color/icon/icon.png"
                 ></v-img>
                 <h3 class="title font-weight-light mb-2">
                   Welcome to Skilljag

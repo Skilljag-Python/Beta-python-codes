@@ -29,7 +29,7 @@ from profiles.forms import UserRegistrationForm
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-     # path('accounts/', include('allauth.urls')),
+     path('google/', include('allauth.urls')),
 
     path("accounts/register/",
          RegistrationView.as_view(
