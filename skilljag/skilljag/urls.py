@@ -31,8 +31,6 @@ urlpatterns = [
 
      # path('accounts/', include('allauth.urls')),
 
-      path('chat/', include('chat.urls')),
-
     path("accounts/register/",
          RegistrationView.as_view(
              form_class=UserRegistrationForm,
@@ -46,6 +44,9 @@ urlpatterns = [
 
     path("api/",
          include("core.api.urls")),
+
+     path("api/",
+         include("chat.api.urls")),
 
     path("api/",
          include("profiles.api.urls")),

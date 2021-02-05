@@ -32,7 +32,7 @@ class Profile(models.Model):
     institution = models.CharField(max_length=30, blank=True)
     company = models.CharField(max_length=30, blank=True)
     designation = models.CharField(max_length=30, blank=True)
-    following = models.ManyToManyField(User, related_name = 'followers', blank = True, null= True)
+    following = models.ManyToManyField(User, related_name = 'followers', blank = True)
     tandcversion = models.IntegerField(default=0)
     
     """ avatar = models.ImageField(upload_to='AvatorPicture/', blank=True) """

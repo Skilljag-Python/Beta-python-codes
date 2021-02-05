@@ -253,6 +253,7 @@ export default {
       axios.patch(`/api/profiles/me/`,{following: following}).then((r) => {
         console.log(r.data)
         this.user.me_following = true;
+        this.$store.dispatch('getInitData');
       });
     },
   },

@@ -269,7 +269,6 @@
                 <v-spacer></v-spacer>
                 <v-file-input
                   v-model="newPost.files"
-                  hide-input
                   multiple
                   class="pa-0 flex-grow-0"
                   show-size

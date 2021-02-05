@@ -1,13 +1,20 @@
 <template>
   <div>
-    <div>{{text}}</div>
+    <div>Hai {{user.id}}</div>
     <chat-window
       style="z-index: 0"
       height="calc(100vh - 115px)"
       class="my-md-5"
-      :currentUserId="currentUserId"
+      :show-audio=false
+      :show-files=false
+      :show-emojis=false
+      :show-reaction-emojis=false
+      :current-user-id="user.id"
       :rooms="rooms"
       :messages="messages"
+      :message-actions = []
+      @send-message="sendMessage"
+      @fetch-messages="fetchMessages"
     />
    <!--  <chat-window
       style="z-index: 0"
@@ -144,6 +151,8 @@
 <script>
 import ChatWindow from "vue-advanced-chat";
 import "vue-advanced-chat/dist/vue-advanced-chat.css";
+const chatSocket = []
+
 
 export default {
   components: {
@@ -152,41 +161,9 @@ export default {
   data() {
     return {
       text:"Test",
-      rooms: [
-        {
-          roomId: 1,
-          roomName: 'Austin',
-          avatar: 'assets/imgs/people.png',
-          unreadCount: 4,
-          index: 3,
-          users: [
-            {
-              _id: 4321,
-              username: 'Austin',
-              avatar: 'assets/imgs/snow.png',
-            }
-          ],
-        }
-      ],
-      messages: [
-      {
-        _id: 7890,
-        content: 'message 1',
-        sender_id: 4321,
-        username: 'John Doe',
-        date: '13 November',
-        timestamp: '10:20',
-        system: false,
-        disable_actions: true,
-        disable_reactions: true,
-        file: {
-          name: 'My File',
-          type: 'png',
-          url: 'https://yt3.ggpht.com/ytc/AAUvwnjE8Rr34euMGiWeb8C5Q7K0WA8hx7-Cdm0oY4PoZw=s900-c-k-c0x00ffffff-no-rj'
-        },
-      }
-    ],
-      currentUserId: 1
+      rooms: [ ],
+      messages: [ ],
+      roomId: null,
     }
   },
   methods: {
@@ -194,7 +171,7 @@ export default {
       this.text = text
     },
     getRooms() {
-      axios.get('/api/chats/')
+      axios.get('/api/rooms/')
       .then(response => {
         console.log(response)
         var rooms = []
@@ -203,41 +180,99 @@ export default {
           room.roomId = element.id
           room.users = []
           element.participants.forEach(e => {
-            var user = []
+            var user = Object()
             user._id = e.id
             user.username = e.firstname
             user.avatar = e.avatar
             room.users.push(user)
-            if(e.id != this.currentUserId)
+            if(e.id != this.user.id)
             {
               room.roomName = user.username
             }
           })
-          console.log(room)
+          room.messages = []
+          element.messages.forEach(e => {
+            var message = Object()
+            message._id = e.id
+            message.content = e.content
+            message.sender_id = e.created_by
+            message.timestamp = e.timestamp
+            message.system=false
+            room.messages.push(message)
+          })
+          /* console.log(room)*/
+          /* let v = this
+          const chatSocket = new WebSocket(
+              'ws://'
+              + window.location.host
+              + '/ws/chat/'
+              + room.roomId
+              + '/'
+          );
+
+          chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            console.log(data.message);
+            v.setText(data.message);
+          }; */
           rooms.push(room)
         });
         console.log(rooms)
         this.rooms = rooms;
+        if(this.roomId){
+          this.getMessages(this.roomId)
+        }
       })
+    },
+    getMessages(roomId){
+      this.rooms.forEach(element => {
+        if(element.roomId == roomId){
+          this.messages = element.messages;
+        }
+      })
+    },
+    sendMessage ({ roomId, content, file, replyMessage }) { 
+      axios.post('/api/messages/',{room:roomId, content:content})
+      .then(response => {
+        console.log(response)
+        if(response.status == 201)
+        {        }
+        this.getRooms()
+      })
+    } ,
+    fetchMessages({room, options}){
+      this.roomId = room.roomId
+      this.getRooms()
+      /* if(options && options.reset){
+        this.getMessages(room.roomId)
+      }
+      else{
+        this.getMessages(room.roomId)
+      } */
+    },
+  },
+  computed :{
+    user(){
+      return this.$store.state.user
     }
   },
   mounted () {
-    //this.getRooms()
-    this.setText("hello")
+    this.getRooms()
+  },
+  created () {
     let v = this
     const chatSocket = new WebSocket(
-            'ws://'
-            + window.location.host
-            + '/ws/chat/'
-            + 'hai'
-            + '/'
-        );
+        'ws://'
+        + window.location.host
+        + '/ws/chat/'
+    );
 
     chatSocket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            console.log(data.message);
-            v.setText(data.message);
-        };
+      const data = JSON.parse(e.data);
+      console.log(data.message);
+      v.setText(data.message);
+      v.getRooms()
+    };
   }
 }
 </script>

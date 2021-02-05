@@ -53,12 +53,13 @@ INSTALLED_APPS = [
 
     'crispy_forms',
     'webpack_loader',
-    'channels',
+
 
     'core',
     'feed',
     'profiles',
-    'chat',
+    'chat'
+
 ]
 
 MIDDLEWARE = [
@@ -98,7 +99,7 @@ WSGI_APPLICATION = 'skilljag.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': str(BASE_DIR / 'db.sqlite3'),
     }
 }
 
@@ -199,14 +200,3 @@ SOCIALACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 SOCIALACCOUNT_AUTO_SIGNUP = True
-
-ASGI_APPLICATION = "skilljag.asgi.application"
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
-        },
-    },
-}
