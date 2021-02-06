@@ -118,6 +118,15 @@ class WorkImageViewSet(mixins.ListModelMixin,
         if 'uid' in self.request.query_params.keys():
             uid = self.request.query_params.get('uid')
             user = User.objects.get(id=uid)
-            queryset = WorkImage.objects.filter(user=user)
+        else:
+            user = self.request.user
+        queryset = WorkImage.objects.filter(user=user)
+
         
         return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def paginate_queryset(self, queryset):
+        return None

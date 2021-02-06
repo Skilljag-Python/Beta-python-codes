@@ -301,7 +301,7 @@ export default {
     {
       axios.get("/api/workimages/?uid="+this.$route.params.id)
       .then(response => {
-        this.workimages = response.data.results
+        this.workimages = response.data
       })
     },
     followDestroy() {

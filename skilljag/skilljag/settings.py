@@ -191,7 +191,7 @@ ACCOUNT_ACTIVATION_DAYS = 7
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'lazartony00@gmail.com'
+EMAIL_HOST_USER = 'skilljag@gmail.com'
 EMAIL_HOST_PASSWORD = 'wlplkeslagdgqomi' #past the key or password app here
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
@@ -203,6 +203,8 @@ SOCIALACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 SOCIALACCOUNT_AUTO_SIGNUP = True
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+
 
 ASGI_APPLICATION = 'skilljag.asgi.application'
 

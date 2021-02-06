@@ -314,7 +314,7 @@ export default {
             message._id = e.id
             message.content = e.content
             message.sender_id = e.created_by
-            message.timestamp = e.timestamp
+            message.timestamp = this.$moment(e.timestamp).fromNow()
             message.system=false
             console.log(message)
             room.messages.push(message)

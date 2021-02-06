@@ -123,4 +123,4 @@ class WorkImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkImage
-        fields = '__all__'
+        fields = [ 'id', 'image']

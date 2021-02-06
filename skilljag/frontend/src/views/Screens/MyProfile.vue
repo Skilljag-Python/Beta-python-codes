@@ -235,6 +235,31 @@
     </v-sheet> -->
      <v-sheet rounded="lg" class="mt-5">
       <v-container class="px-4">Work Gallery</v-container>
+      <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="editimages = ! editimages"
+                >Edit </v-btn>
+      <v-file-input
+      v-if="editimages"
+      v-model="newImages"
+      placeholder="Upload Images"
+      multiple
+      class="pa-0 flex-grow-0"
+      show-size
+      truncate-length="15"
+      accept="image/*"
+      change="handleFileSelect"
+    ></v-file-input>
+    <v-div v-if="editimages">Tap on the images to delete</v-div>
+    <v-btn
+    v-if="editimages"
+      color="blue darken-1"
+      :loading="submitLoading"
+      text
+      @click="uploadImages"
+    >DONE </v-btn>
+
       <div v-if="userLoading">
         <v-skeleton-loader
           class="mx-auto"
@@ -247,8 +272,9 @@
       <v-row v-else class="pa-15">
         <v-col v-for="image in workimages" :key="image.id" class="d-flex child-flex" cols="4">
           <v-img
+            @click="imageclicked(image.id)"
             :src="image.image"
-            aspect-ratio="1"
+            contain
             class="grey lighten-2"
           >
             <template v-slot:placeholder>
@@ -278,19 +304,83 @@ export default {
     editEnabled: false,
     aboutDialog: false,
     aboutSubmitLoading: false,
+    submitLoading: false,
     userLoading: false,
-    workimages: []
+    workimages: [],
+    newImages: [],
+    editimages:false,
   }),
   mounted: function () {
     // window.home.selected=false;
     this.loadUser();
   },
   methods: {
+    handleFileSelect(v) {
+      this.newImages = [];
+      console.log(v);
+      let fileList = v;
+      fileList.forEach((f) => {
+        if (!f.type.match("image.*")) {
+          return;
+        }
+
+        // this.newImages.push(URL.createObjectURL(f));
+        // URL.revokeObjectURL(this.src);
+
+        let reader = new FileReader();
+        let that = this;
+
+        reader.onload = function (e) {
+          that.newImages.push(e.target.result);
+        };
+        reader.readAsDataURL(f);
+      });
+    },
+    
+    uploadImages() {
+      
+      var count = this.newImages.length
+      if(count>0){
+        this.submitLoading=true
+      for (var i = 0; i < this.newImages.length; i++) {
+        let file = this.newImages[i];
+        const imagedata = new FormData();
+        imagedata.append('image',file)
+        axios
+        .post("/api/workimages/", imagedata)
+        .then(response => {
+          count--;
+          if(count == 0)
+          {
+            this.newImages = []
+            this.submitLoading = false
+            this.editimages= false
+            this.loadWorkGallery()
+          }
+          });
+        }
+      }
+      else{
+        this.editimages= false
+        this.loadWorkGallery()
+      }
+    },
+    deleteImage(imgId){
+      axios.delete('/api/workimages/'+imgId+'/')
+      .then(response => {
+          this.loadWorkGallery()
+      })
+    },
+    imageclicked(imgid){
+      if(this.editimages){
+        this.deleteImage(imgid)
+      }
+    },
     loadWorkGallery()
     {
       axios.get("/api/workimages/?uid="+this.$store.state.user.id)
       .then(response => {
-        this.workimages = response.data.results
+        this.workimages = response.data
       })
     },
     submitAbout() {
@@ -323,6 +413,7 @@ export default {
       axios.get("/api/profiles/me/").then((r) => {
         this.user = r.data;
         this.userLoading = false;
+        this.loadWorkGallery()
       });
     },
   },
