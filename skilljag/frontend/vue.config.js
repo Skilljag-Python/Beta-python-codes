@@ -10,7 +10,7 @@ module.exports = {
     'vuetify'
   ],
     // on Windows you might want to set publicPath: "http://127.0.0.1:8080/" 
-    publicPath: "http://192.168.2.148:8080/", 
+    publicPath: "http://0.0.0.0:8080/", 
     outputDir: './dist/',
 
 
@@ -31,8 +31,8 @@ module.exports = {
 
         config.devServer
             // the first 3 lines of the following code have been added to the configuration
-            .public('http://192.168.2.148:8080')    
-            .host('192.168.2.148')    
+            .public('http://127.0.0.1:8080')    
+            .host('127.0.0.1')    
             .port(8080)
             .hotOnly(true)
             .watchOptions({poll: 1000})
@@ -43,13 +43,13 @@ module.exports = {
     },
     
 
-    // uncomment before executing 'npm run build' 
-    // css: {
-    //     extract: {
-    //       filename: 'bundle.css',
-    //       chunkFilename: 'bundle.css',
-    //     },
-    // }
+    //uncomment before executing 'npm run build' 
+    css: {
+        extract: {
+          filename: 'bundle.css',
+          chunkFilename: 'bundle.css',
+        },
+    },
 
     transpileDependencies: [
       'vuetify'

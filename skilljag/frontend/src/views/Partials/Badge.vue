@@ -20,14 +20,14 @@
       <v-icon :color="['yellow darken-3', 'blue', 'green'][0]"
         >mdi-check-bold</v-icon
       >
-      Willing to work in a startup in a startup, projects, MSMEs or other small
+      Willing to work in startups, projects, MSMEs or other small
       ventures.
     </div>
     <div>
       <v-icon :color="['yellow darken-3', 'blue', 'green'][1]"
         >mdi-check-bold</v-icon
       >
-      Willing to mentor startups and projects with your intellectual skills and
+      Willing to mentor startups and projects with my intellectual skills and
       knowledge.
     </div>
     <div>

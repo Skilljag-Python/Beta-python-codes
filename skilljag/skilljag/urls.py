@@ -19,6 +19,7 @@ from django.urls import include, path, re_path
 
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import TemplateView
 
 from django_registration.backends.activation.views import RegistrationView
 
@@ -28,6 +29,8 @@ from profiles.forms import UserRegistrationForm
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    path('aboutus/', TemplateView.as_view(template_name='about.html')),
 
      path('google/', include('allauth.urls')),
 
