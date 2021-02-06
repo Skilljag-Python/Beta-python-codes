@@ -1,6 +1,21 @@
 <template>
   <div>
-    <div>Hai {{text}}</div>
+    <div>
+    <v-btn
+      class="ma-2"
+      outlined
+      fab
+      color="teal"
+      small
+      @click="InOutToggleM"
+    >
+      <v-icon v-if="pending">mdi-account-arrow-left-outline</v-icon>
+      <v-icon v-else >mdi-account-arrow-right-outline</v-icon>
+    </v-btn>
+    <span v-if="pending">REQUESTS</span>
+    <span v-else>CONVERSATIONS</span>
+ </div>
+
     <chat-window
       style="z-index: 0"
       height="calc(100vh - 115px)"
@@ -160,45 +175,77 @@ export default {
   },
   data() {
     return {
-      text:"Test",
       rooms: [ ],
       messages: [ ],
       roomId: null,
       chatSocket: null,
       count: 0,
+      pending:false,
     }
   },
   methods: {
+    InOutToggleM(){
+      this.pending = ! this.pending
+      this.messages = []
+      this.getRooms()
+    },
     setText(text) {
       this.text = text
     },
-    getRooms() {
+    getRooms()
+    {
+      if(this.pending)
+      {
+        this.getPendingRooms()
+      }
+      else
+      {
+          this.getAllowedRooms()
+      }
+    },
+    getAllowedRooms() {
       axios.get('/api/rooms/')
       .then(response => {
         console.log(response)
         var rooms = []
-        response.data.results.forEach(element => {
+        response.data.forEach(element => {
           var room = Object()
           room.roomId = element.id
           room.users = []
-          element.participants.forEach(e => {
-            var user = Object()
-            user._id = e.id
-            user.username = e.firstname
-            user.avatar = e.avatar
-            room.users.push(user)
-            if(e.id != this.user.id)
-            {
-              room.roomName = user.username
-            }
-          })
+          room.roomName = ''
+          room.flag = 0;
+          if(element.participants.length>1)
+          {
+            element.participants.forEach(e => {
+              var user = Object()
+              user._id = e.id
+              user.username = e.firstname
+              user.avatar = e.avatar
+              room.users.push(user)
+              if(e.id != this.user.id)
+              {
+                room.roomName = user.username+','
+                room.flag = 1;
+              }
+            })
+          }
+          if(element.pending_participants.length>0){
+            room.roomName += "Pending:"
+            element.pending_participants.forEach(e => {
+              room.roomName += e.firstname+','
+            })
+          }
+          if(room.roomName!=''){
+            var len = room.roomName.length
+            room.roomName = room.roomName.slice(0,len-1)
+          }
           room.messages = []
           element.messages.forEach(e => {
             var message = Object()
             message._id = e.id
             message.content = e.content
             message.sender_id = e.created_by
-            message.timestamp = e.timestamp
+            message.timestamp = this.$moment(e.timestamp).fromNow()
             message.system=false
             room.messages.push(message)
           })
@@ -211,10 +258,90 @@ export default {
         }
       })
     },
+    getPendingRooms(){
+      axios.get('/api/rooms/?pending=1')
+      .then(response => {
+        console.log(response)
+        var rooms = []
+        response.data.forEach(element => {
+          console.log(element)
+          var room = Object()
+          room.roomId = element.id
+          room.users = []
+          room.roomName = ''
+          room.flag = 0;
+          if(element.participants.length>0)
+          {
+            element.participants.forEach(e => {
+              var user = Object()
+              user._id = e.id
+              user.username = e.firstname
+              user.avatar = e.avatar
+              room.users.push(user)
+              if(e.id != this.user.id)
+              {
+                room.roomName = user.username+','
+                room.flag = 1;
+              }
+            })
+          }
+          if(element.pending_participants.length>1){
+            room.roomName += "Pending:"
+            element.pending_participants.forEach(e => {
+              if(e.id != this.user.id)
+              {
+                room.roomName += e.firstname+','
+              }
+            })
+          }
+          if(room.roomName!=''){
+            var len = room.roomName.length
+            room.roomName = room.roomName.slice(0,len-1)
+          }
+          /* room.messages = []
+          var message = Object()
+          message._id = 1
+          message.content = "To grant permission reply back"
+          message.sender_id=room.user[0].;
+          message.system=true
+          room.messages.push(message)
+          rooms.push(room) */
+          room.messages = []
+          if(element.messages.length>0)
+          {
+            var e = element.messages[0]
+            var message = Object()
+            message._id = e.id
+            message.content = e.content
+            message.sender_id = e.created_by
+            message.timestamp = e.timestamp
+            message.system=false
+            console.log(message)
+            room.messages.push(message)
+          }
+          else{
+            var message = Object()
+            message._id = "1"
+            message.content = "To grant permission reply back"
+            message.sender_id=1;
+            message.system=true
+            room.messages.push(message)
+          }
+          rooms.push(room)
+        });
+        
+        console.log(rooms)
+        this.rooms = rooms;
+        if(this.roomId){
+          this.getMessages(this.roomId)
+        }
+      })
+    },
     getMessages(roomId){
       this.rooms.forEach(element => {
         if(element.roomId == roomId){
           this.messages = element.messages;
+          console.log("Haaaai")
         }
       })
     },
@@ -239,11 +366,17 @@ export default {
               this.messages.push(message)
             }
           }) */
+          if(this.pending)
+          {
+          this.InOutToggleM()
+          }
          }
       }) 
     } ,
     fetchMessages({room, options}){
       this.roomId = room.roomId
+      console.log("QQQQQQ")
+      console.log(this.roomId)
       this.getMessages(this.roomId)
       /* if(options && options.reset){
         this.getMessages(room.roomId)

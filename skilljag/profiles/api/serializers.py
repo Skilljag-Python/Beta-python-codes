@@ -2,7 +2,7 @@ from django.contrib.auth import models
 from core.api.serializers import CitySerializer, SkillSerializer, ValueSerializer
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from ..models import Profile, AvatarImage
+from ..models import Profile, AvatarImage, WorkImage
 from core.models import Skill, Value
 
 class UserCompactSerializer(serializers.ModelSerializer):
@@ -33,6 +33,7 @@ class AvatarImageSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
 
     email = serializers.CharField(source='user.email', read_only=True)
+    skills = serializers.PrimaryKeyRelatedField(many=True, read_only=False, queryset=Skill.objects.all())
     #skills = SkillSerializer(many = True,required= False, read_only=True)
     #values = ValueSerializer(many = True,required = False)
     #following = UserCompactSerializer(many=True, required = False, read_only = True)
@@ -54,10 +55,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         else:
             return False
 
-    def update(self, instance, validated_data):
+    """ def update(self, instance, validated_data):
         skills_data = []
         values_data = []
-        print("@@@@@@@@@@@@@",validated_data.values())
+        askills_data = []
+        print("@@@@@@@@@@@@@",validated_data.keys())
         if('skills' in validated_data.keys()):
             skills_data = validated_data.pop('skills')
             print("***************",skills_data)
@@ -73,6 +75,14 @@ class ProfileSerializer(serializers.ModelSerializer):
                     nskill = nskills.first()
                     instance.skills.add(nskill)
 
+        if(len(askills_data)>0):
+            instance.askills.set([])
+            for askill_data in askills_data:
+                naskills = Skill.objects.filter(id=askill_data.id)
+                if(naskills.exists()):
+                    naskill = naskills.first()
+                    instance.askills.add(naskill)
+
         if(len(values_data)>0):
             instance.values.set([])
             for value_data in values_data:
@@ -81,7 +91,7 @@ class ProfileSerializer(serializers.ModelSerializer):
                     nvalue = nvalues.first()
                     instance.values.add(nvalue)
 
-        return instance
+        return instance """
 
     """ def update(self, instance, validated_data):
         skills = validated_data.pop('skills', [])
@@ -108,3 +118,9 @@ class ProfileFollowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ['id','following']
+
+class WorkImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = WorkImage
+        fields = '__all__'

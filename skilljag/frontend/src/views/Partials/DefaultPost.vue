@@ -28,6 +28,7 @@
         <div class="mt-3" style="width: 100%">
           <template v-if="item.images.length==1">
             <v-img
+            contain
               :src="item.images[0].image"
               aspect-ratio="2"
               style="border-radius: 10px"

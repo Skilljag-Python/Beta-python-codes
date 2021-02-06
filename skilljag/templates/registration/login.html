@@ -3,15 +3,14 @@
 
 {% block auth %}
 
-
-
+<div class="bgimg"></div>
 <div class="login-form-container">
     <form method="POST">
         {% csrf_token %}
       <div class="container">
           <div class="myCard">
               <div class="row">
-                  <div class="col-md-6">
+                  <div class="col-md-11">
                       <div class="myLeftCtn"> 
                           <form class="myForm text-center">
                               <div class="img"> <img src= "/media/login/text.png"  width="135" height="60">
@@ -28,32 +27,31 @@
                                     <button type="submit" class="btn btn-sm btn-outline-primary" style="background-color: #a758ef; color: white; outline: none; border-radius: 10%;">Login</button>
                                         <br>
                                             <br>
-                                        <a href="{% url 'django_registration_register' %}"><span style="color: #a758ef;">Forgot Password?</span></a></p>
                                     <hr> 
                                 </form>
     <p class="mt-2"> <a href="{% url 'django_registration_register' %}"><span style="color: #a758ef;">Create an Account</span></a>   Or</p> 
                   </div>
                 <div>
-    <a href="http://skilljag.com:8000/google/google/login/?process=login&next=%2F" type="submit" class="btn btn-sm btn-outline-primary" style="background-color: #a758ef; color: white; outline: none; ">Sign in with Google</a>
+    <a href="http://skilljag.com:8000/google/google/login/?process=login&next=%2F" class="btn btn-sm btn-outline-primary" style="background-color: #a758ef; color: white; outline: none; ">Sign in with Google</a>
 </div>
 
                           </form>
                       </div>
                   </div> 
-                  <div class="col-md-6">
+                 <!--  <div class="col-md-6">
                       <div class="myRightCtn">
                               <div class="box">
-                              <img src="/media/login/logbanner.png" width="478" height="390">
+                              <img src="/media/login/logbanner2.jpg" width="470" height="400">
                               <div class="bannertag"> 
                             </div>
-                              </div>
+                              </div> -->
                                   
                       </div>
                   </div>
               </div>
           </div>
   </div>
-
+</div>
 {% endblock %}
 
 

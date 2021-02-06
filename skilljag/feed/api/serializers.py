@@ -5,7 +5,7 @@ from profiles.api.serializers import UserCompactSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from ..models import BookMark, Comment, Interest, Post, PostImage
+from ..models import BookMark, Comment, Interest, Notification, Post, PostImage
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -136,5 +136,12 @@ class BookMarkSerializer(serializers.ModelSerializer):
                 fields=['post', 'created_by']
             )
         ]
+
+class NotificationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = Notification
+        fields = '__all__'
 
 

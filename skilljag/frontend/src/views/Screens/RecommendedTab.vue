@@ -115,6 +115,7 @@
     </v-col>
 
     <v-col cols="12" sm="3">
+      <ad></ad>
       <v-sheet
         rounded="lg"
         min-height="268"

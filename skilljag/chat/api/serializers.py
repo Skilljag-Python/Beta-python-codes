@@ -14,8 +14,9 @@ class MessageSerializer(serializers.ModelSerializer):
 class RoomSerializer(serializers.ModelSerializer):
 
     participants = UserCompactSerializer(many = True, read_only = True)
+    pending_participants = UserCompactSerializer(many = True, read_only = True)
     messages = MessageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Room
-        fields = ['id','participants','messages']
+        fields = ['id','participants','messages','pending_participants']

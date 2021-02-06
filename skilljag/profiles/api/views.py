@@ -1,14 +1,16 @@
 from rest_framework.generics import get_object_or_404
 from django.db import models
-from ..models import Profile, AvatarImage
+from ..models import Profile, AvatarImage, WorkImage
 from core.models import Skill
 from django.utils.timezone import now
 from rest_framework import viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import ProfileFollowSerializer, ProfileSerializer, AvatarImageSerializer
+from .serializers import ProfileFollowSerializer, ProfileSerializer, AvatarImageSerializer, WorkImageSerializer
 from .permissions import IsOwnerOrReadOnly
+from django.contrib.auth.models import User
+
 
 class AvatarImageViewSet(mixins.CreateModelMixin,
                    mixins.UpdateModelMixin,
@@ -81,6 +83,8 @@ class ProfileViewSet(mixins.RetrieveModelMixin,
         return super().get_object()
 
     def perform_update(self, serializer):
+        data = self.request.data
+        print("aaaaaaaaaaaaaaaaaaa",self.request.data)        
         serializer.save(last_updated_at = now())
 
     def perform_destroy(self, instance):
@@ -100,3 +104,20 @@ class ProfileFollowerViewSet(mixins.RetrieveModelMixin,
         if self.kwargs.get('pk') == 'me':
             return self.request.user.profile
         return super().get_object()
+
+class WorkImageViewSet(mixins.ListModelMixin,
+                        mixins.CreateModelMixin,
+                        mixins.DestroyModelMixin,
+                        viewsets.GenericViewSet):
+
+    serializer_class = WorkImageSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+
+        if 'uid' in self.request.query_params.keys():
+            uid = self.request.query_params.get('uid')
+            user = User.objects.get(id=uid)
+            queryset = WorkImage.objects.filter(user=user)
+        
+        return queryset

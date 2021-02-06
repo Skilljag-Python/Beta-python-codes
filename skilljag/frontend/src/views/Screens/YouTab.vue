@@ -204,7 +204,7 @@
                     ></v-autocomplete
                   ></v-col>
                 </v-row>
-                <v-row>
+                <!-- <v-row>
                   <v-col cols="12" md="3"
                     ><span
                       class="sub-title"
@@ -233,7 +233,7 @@
                       ]"
                     ></v-autocomplete
                   ></v-col>
-                </v-row>
+                </v-row> -->
                 <v-row>
                   <v-col cols="6" v-for="(image, i) in newImages" :key="i">
                     <v-img
@@ -262,7 +262,7 @@
                   class="pa-0 flex-grow-0"
                   show-size
                   truncate-length="15"
-                  accept="image/*,.pdf"
+                  accept="image/*"
                   change="handleFileSelect"
                 ></v-file-input>
                 <v-btn color="blue darken-1" text @click="dialog = false">

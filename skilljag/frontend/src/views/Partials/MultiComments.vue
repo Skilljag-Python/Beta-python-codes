@@ -89,6 +89,7 @@ export default {
 }
 /* Reply component */
 .reply {
+    border-radius: 25px;
     display: flex;
     position: relative;
     align-items: center;

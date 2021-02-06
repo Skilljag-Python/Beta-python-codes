@@ -13,9 +13,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ..models import BookMark, Comment, Interest, Post, PostImage
-from .serializers import BookMarkSerializer, CommentSerializer, ImageSerializer, InterestSerializer, PostImageSerializer, PostSerializer
+from ..models import BookMark, Comment, Interest, Post, PostImage, Notification
+from .serializers import BookMarkSerializer, CommentSerializer, ImageSerializer, InterestSerializer, NotificationSerializer, PostImageSerializer, PostSerializer
 from .permissions import IsAuthorOrReadOnly
+
+
 
 class PostViewSet(mixins.CreateModelMixin, 
                    mixins.RetrieveModelMixin, 
@@ -68,7 +70,7 @@ class PostViewSet(mixins.CreateModelMixin,
             skill3 = skills[2].id
             skill4 = skills[3].id """
             filters&= (models.Q(created_by__in=following)| models.Q(created_by=user))
-            queryset = Post.objects.filter(filters)
+            queryset = Post.objects.filter(filters).order_by('-timestamp')
         else:
             for k,vals in query_dict.items():
                 if k in ['category','skills','values','created_by']:
@@ -157,3 +159,17 @@ class PostImageViewSet(mixins.CreateModelMixin,
 
     serializer_class = ImageSerializer
     permission_classes = [IsAuthenticated]
+
+class NotificationViewSet(mixins.ListModelMixin,
+                        mixins.DestroyModelMixin,
+                        viewsets.GenericViewSet):
+
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Notification.objects.filter(user=self.request.user)
+        return queryset
+
+    def paginate_queryset(self, queryset):
+        return None

@@ -70,7 +70,7 @@
           </v-col>
           <v-col cols="auto" class="align-self-center" v-if="!userIsCurrentUser">
             <v-btn
-              to="/conversations"
+              @click="sendMessage()"
               depressed
               color="primary"
               :disabled="userIsCurrentUser"
@@ -175,7 +175,38 @@
           {{ user.bio }}
         </p>
       </v-container>
+</v-sheet>
+      <v-sheet rounded="lg" class="mt-5">
+      <v-container class="px-4">Work Gallery</v-container>
+      <div v-if="userLoading">
+        <v-skeleton-loader
+          class="mx-auto"
+          max-width1="300"
+          type="list-item-avatar, divider, card-heading, image, actions"
+          v-for="n in 2"
+          :key="n"
+        ></v-skeleton-loader>
+      </div>
+      <v-row v-else class="pa-15">
+        <v-col v-for="image in workimages" :key="image.id" class="d-flex child-flex" cols="4">
+          <v-img
+            :src="image.image"
+            aspect-ratio="1"
+            class="grey lighten-2"
+          >
+            <template v-slot:placeholder>
+              <v-row class="fill-height ma-0" align="center" justify="center">
+                <v-progress-circular
+                  indeterminate
+                  color="grey lighten-5"
+                ></v-progress-circular>
+              </v-row>
+            </template>
+          </v-img>
+        </v-col>
+      </v-row>
     </v-sheet>
+    
     <!-- <v-sheet rounded="lg" class="mt-5">
       <v-container class="px-4">Work Gallery</v-container>
       <div v-if="userLoading">
@@ -226,8 +257,8 @@
             </template>
           </v-img>
         </v-col>
-      </v-row>
-    </v-sheet> -->
+      </v-row> -->
+     
   </div>
 </template>
 
@@ -240,11 +271,24 @@ export default {
       askills:[],
     },
     userLoading: false,
+    workimages:[]
   }),
   mounted: function () {
     this.loadUser();
+    this.loadWorkGallery()
   },
   methods: {
+
+    sendMessage(){
+      axios.get('/api/rooms/?uid='+this.user.id)
+      .then((response) => {
+        console.log(response)
+        if(response.status == 200)
+        {
+          this.$router.push({path:'/conversations'})
+        }
+      })
+    },
     loadUser() {
       this.userLoading = true;
       axios.get("/api/profiles/" + this.$route.params.id + '/').then((r) => {
@@ -253,33 +297,42 @@ export default {
         this.userLoading = false;
       });
     },
+    loadWorkGallery()
+    {
+      axios.get("/api/workimages/?uid="+this.$route.params.id)
+      .then(response => {
+        this.workimages = response.data.results
+      })
+    },
     followDestroy() {
       var fol;
       var following=[];
-      for (fol of this.$store.state.user.followers)
-      {
-        if(fol.id!=this.user.id)
+      this.$store.state.user.following.forEach(fol =>{
+         console.log(fol)
+        if(fol!=this.user.id)
         {
-          following.push(fol.id)
+          following.push(fol)
         }
-      }
+      })
 
       axios.patch(`/api/profiles/me/`,{following: following}).then((r) => {
         console.log(r.data)
         this.user.me_following = false;
+        this.$store.dispatch('getInitData');
       });
     },
     follow() {
       var fol;
       var following=[];
-      for (fol of this.$store.state.user.followers)
-      {
-        if(fol.id!=this.user.id)
+      this.$store.state.user.following.forEach(fol =>{
+         console.log(fol)
+        if(fol!=this.user.id)
         {
-          following.push(fol.id)
+          following.push(fol)
         }
-      }
+      })
       following.push(this.user.id)
+      console.log({following: following})
       axios.patch(`/api/profiles/me/`,{following: following}).then((r) => {
         console.log(r.data)
         this.user.me_following = true;

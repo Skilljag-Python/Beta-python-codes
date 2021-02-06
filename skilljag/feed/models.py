@@ -1,6 +1,9 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.contrib.auth.models import User
 from core.models import Skill, Value, City
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Post(models.Model):
@@ -74,3 +77,42 @@ class Comment (models.Model):
     class Meta:
 
         ordering = ['timestamp']
+
+class Notification(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    type = models.CharField(max_length = 1, choices = (('I', 'Interest'),('C', 'Comment'),('F', 'Follow')))
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name = 'notifications')
+    value = models.IntegerField()
+
+@receiver(post_save, sender=Comment)
+def add_notification_on_comment(sender, instance, created, **kwargs):
+    if created:
+        post = instance.post
+        user = instance.post.created_by
+        type = 'C'
+        try:
+            notif = Notification.objects.get(post=post,type='C')
+        except ObjectDoesNotExist:
+            notif = None
+
+        if notif:
+            notif.value = notif.value+1
+            notif.save()
+        else:
+            notif = Notification.objects.create(post=post,value=1,type='C',user=user)
+
+@receiver(post_save, sender=Interest)
+def add_notification_on_interest(sender, instance, created, **kwargs):
+    if created:
+        post = instance.post
+        user = instance.post.created_by
+        try:
+            notif = Notification.objects.get(post=post,type='I')
+        except ObjectDoesNotExist:
+            notif = None
+
+        if notif:
+            notif.value.set(notif.value+1)
+        else:
+            notif = Notification.objects.create(post=post,value=1,type='I',user=user)

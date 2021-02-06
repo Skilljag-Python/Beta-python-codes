@@ -559,9 +559,9 @@ export default {
         company: this.company,
         designation: this.designation,
         bio: this.bio,
-        values: this.values.id,
-        skills: this.skills.id,
-        askills: this.askills.id,
+        values: this.values,
+        skills: this.skills,
+        askills: this.askills,
         completed_at: new Date
       });
     },
@@ -579,6 +579,7 @@ export default {
       }
     },
     async submit(resource, data) {
+      console.log(data)
       this.$http
         .patch(resource, data)
         .then((response) => {

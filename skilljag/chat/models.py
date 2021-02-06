@@ -3,8 +3,8 @@ from django.contrib.auth.models import User
 
 class Room(models.Model):
 
-    participants = models.ManyToManyField(User, related_name="rooms")
-    allowed = models.ManyToManyField(User, related_name="allowed_rooms")
+    participants = models.ManyToManyField(User, related_name="rooms", blank =True)
+    pending_participants = models.ManyToManyField(User, related_name="pending_rooms", blank =True)
 
 
 class Message(models.Model):

@@ -233,6 +233,36 @@
         </v-col>
       </v-row>
     </v-sheet> -->
+     <v-sheet rounded="lg" class="mt-5">
+      <v-container class="px-4">Work Gallery</v-container>
+      <div v-if="userLoading">
+        <v-skeleton-loader
+          class="mx-auto"
+          max-width1="300"
+          type="list-item-avatar, divider, card-heading, image, actions"
+          v-for="n in 2"
+          :key="n"
+        ></v-skeleton-loader>
+      </div>
+      <v-row v-else class="pa-15">
+        <v-col v-for="image in workimages" :key="image.id" class="d-flex child-flex" cols="4">
+          <v-img
+            :src="image.image"
+            aspect-ratio="1"
+            class="grey lighten-2"
+          >
+            <template v-slot:placeholder>
+              <v-row class="fill-height ma-0" align="center" justify="center">
+                <v-progress-circular
+                  indeterminate
+                  color="grey lighten-5"
+                ></v-progress-circular>
+              </v-row>
+            </template>
+          </v-img>
+        </v-col>
+      </v-row>
+    </v-sheet>
   </div>
 </template>
 
@@ -249,12 +279,20 @@ export default {
     aboutDialog: false,
     aboutSubmitLoading: false,
     userLoading: false,
+    workimages: []
   }),
   mounted: function () {
     // window.home.selected=false;
     this.loadUser();
   },
   methods: {
+    loadWorkGallery()
+    {
+      axios.get("/api/workimages/?uid="+this.$store.state.user.id)
+      .then(response => {
+        this.workimages = response.data.results
+      })
+    },
     submitAbout() {
       this.aboutSubmitLoading = true;
       this.$http

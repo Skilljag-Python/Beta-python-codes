@@ -18,7 +18,7 @@ class Profile(models.Model):
     bio = models.CharField(max_length = 350, blank = True)
     phone = models.CharField(max_length = 13, blank = True)
     city = models.ForeignKey(City, on_delete = models.SET_NULL, related_name = 'users', null=True)
-    state = models.ForeignKey(State, on_delete = models.SET_NULL, related_name = 'users', null=True)
+    state = models.ForeignKey(State, on_delete = models.SET_NULL, related_name = 'users', null=True, blank = True)
     languages = models.ManyToManyField(Language, related_name='users', blank=True)
     skills = models.ManyToManyField(Skill, related_name = 'users', blank= True)
     askills = models.ManyToManyField(Skill, related_name = 'ausers', blank= True)
@@ -85,3 +85,9 @@ class Ban(models.Model):
 
     def __str__(self):
         return self.user.__str__()
+
+
+class WorkImage(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='work_gallery')
+    image = models.ImageField(upload_to='WorkGallery/')

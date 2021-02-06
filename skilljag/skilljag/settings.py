@@ -192,10 +192,10 @@ ACCOUNT_ACTIVATION_DAYS = 7
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'lazartony00@gmail.com'
-EMAIL_HOST_PASSWORD = 'xbgekjghzdcybkyj' #past the key or password app here
+EMAIL_HOST_PASSWORD = 'wlplkeslagdgqomi' #past the key or password app here
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'lazartony00@gmail.com'
+DEFAULT_FROM_EMAIL = 'skilljag@gmail.com'
 
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_REQUIRED = True
