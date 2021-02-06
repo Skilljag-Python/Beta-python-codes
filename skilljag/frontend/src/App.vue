@@ -37,7 +37,7 @@
               text
               @click="dialog = false"
             >
-              <a href="https://forms.zohopublic.in/skilljagindaiapvtltd/form/Promoterform/formperma/Mj2ksolHPexQ7VwYltX8clu5KpAozZx8XnpMEck2xcI?zf_rszfm=1" target="_blank">Ok!</a>
+              <a href="/feedback/" target="_blank">Ok!</a>
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -79,7 +79,7 @@ export default {
     callFunction () {
       setTimeout( () =>
           this.dialog="true"
-    , 600000);
+    , 300000);
     }
   },
 

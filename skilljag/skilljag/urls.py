@@ -32,6 +32,8 @@ urlpatterns = [
 
     path('aboutus/', TemplateView.as_view(template_name='about.html')),
 
+    path('feedback/', TemplateView.as_view(template_name='feedback.html')),
+
      path('google/', include('allauth.urls')),
 
     path("accounts/register/",

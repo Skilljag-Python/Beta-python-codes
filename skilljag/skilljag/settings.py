@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '^*k(dcyewdwy5%y5gyvsy*7b+ul66v6a#7+cna)o+v+gt*n@95'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -153,6 +153,8 @@ STATICFILES_DIRS = [
     BASE_DIR / "assets",
     BASE_DIR / "frontend/dist",
 ]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 # django-crispy-forms
 CRISPY_TEMPLATE_PACK = "bootstrap4"

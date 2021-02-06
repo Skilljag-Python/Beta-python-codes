@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block style %}
+    <link type="text/css" href="{% static 'css/app.2c8d0040.css' %}">
+    <link type="text/css" href="{% static 'css/chunk-vendors.37d9848e.css' %}">
+{% endblock %}
+
+{% block content %}
+<noscript>
+    <strong>We're sorry but frontend doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+</noscript>
+<div id="app"></div>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="{% static 'js/app.95c905ec.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/chunk-vendors.195da0cd.js' %}"></script>
+{% endblock %}
